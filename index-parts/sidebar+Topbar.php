@@ -70,8 +70,8 @@
                 </a>
                 <div id="collapseStore" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="./store/product_management.html">商品管理系統</a>
-                        <a class="collapse-item" href="./store/order_management.html">訂單管理系統</a>
+                        <a class="collapse-item" href="../store/product_management.php">商品管理</a>
+                        <a class="collapse-item" href="../store/order_management.php">訂單管理</a>
                     </div>
                 </div>
             </li>
