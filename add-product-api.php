@@ -29,13 +29,7 @@ $inventory = $_POST['inventory'];
 $sale = $_POST['sale'];
 
 # 後端檢查
-$isPass = true;
-
-// 判斷 email:PHP regex function 如果 email 判斷為 false 代表格式有誤
-// if (! filter_var($email, FILTER_VALIDATE_EMAIL)){
-//   $isPass = false;
-//   $output['errors']['email'] = 'email 格式錯誤';
-// }
+// $isPass = true;
 
 //如果庫存量為0,sale設定為0
 if (intval($inventory) === 0) {

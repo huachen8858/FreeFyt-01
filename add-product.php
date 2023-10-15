@@ -50,14 +50,17 @@ $title = '新增商品';
           <label for="mainImg" class="form-label">主要商品圖片</label>
           <p>(建議 600 x 600px, 檔案大小 500K 以內)</p>
           <input type="file" class="form-control" name="mainImg" id="img">
-          </div>
+          <div class="form-text"></div>
+        </div>
         <div class="mb-3">
           <label for="moreImg" class="form-label">更多商品圖片</label>
           <input type="file" class="form-control" name="moreImg" id="moreImg" multiple>
+          <div class="form-text"></div>
         </div>
         <div class="mb-3">
           <label for="inventory" class="form-label">庫存數量</label>
-          <input type="number" class="form-control" id="inventory" mobile="inventory" min="0" max="99999">
+          <input type="number" class="form-control" id="inventory" mobile="inventory">
+          <div class="form-text"></div>
         </div>
         <div class="mb-3">
           <label for="sale" class="form-label">上架狀態</label>&nbsp;
@@ -68,7 +71,7 @@ $title = '新增商品';
         </div>
         <div class="d-flex justify-content-end">
           <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
-          <button type="button" onsubmit="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
+          <button type="button" onclick="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
         </div>
       </form>
     </div>
@@ -136,9 +139,6 @@ $.each(product_category, function(index, value){
 })
 
 
-
-
-
 // 按下送出按鈕要執行以下
   function sendData(e) {
     e.preventDefault();
@@ -155,7 +155,7 @@ $.each(product_category, function(index, value){
     let isPass = true;
 
     // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
-    
+
 
     // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
@@ -171,8 +171,29 @@ $.each(product_category, function(index, value){
       price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
     }
 
-    // moreImg 非必填: 是否要判別跟主圖片一樣就提醒
+    // 4.category 如果value沒有值，就代表沒選 (尚未釐清)
+    // if (!category) {
+    //   isPass = false;
+    //   category.style.border = '2px solid red';
+    //   category.nextElementSibling.innerHTML = '請選擇商品類別';
+    // }
+
+    // 5.mainImg 如果圖片沒有值 代表資料有誤
+    if (!mainImg.value) {
+      isPass = false;
+      mainImg.style.border = '2px solid red';
+      mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
+    }
+
+    // 6.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
     
+
+    // 7.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
+    if (!inventory.value || inventory.value < 0) {
+      isPass = false;
+      inventory.style.border = '2px solid red';
+      inventory.nextElementSibling.innerHTML = '請填寫庫存';
+    }
     
     // 沒有通過就不要發送資料
     if (!isPass) {
