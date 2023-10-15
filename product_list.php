@@ -127,7 +127,7 @@ if ($totalRows > 0) {
 <script>
     function deleteItem(sid) {
         if (confirm(`確定要刪除編號 ${sid} 的資料嗎?`)) {
-            location.href = 'delete.php?sid=' + sid;
+            location.href = 'delete-product.php?sid=' + sid;
         }
     }
 </script>
