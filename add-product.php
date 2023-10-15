@@ -1,7 +1,7 @@
 <?php
 require './index-parts/connect_db.php';
 $pageName = 'add';
-$title = '新增商品'
+$title = '新增商品';
 
 ?>
 <style>
@@ -19,7 +19,7 @@ $title = '新增商品'
     <div class="card-body">
       <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
       <hr>
-      <form name="form1">
+      <form name="form1" onsubmit="sendData(event)">
         <div class="mb-3">
           <label for="product_id" class="form-label">商品編號</label>
           <input type="text" class="form-control" id="product_id" name="product_id" disabled placeholder="Pxxxx (待確認新增商品後會自動生成)">
@@ -31,8 +31,8 @@ $title = '新增商品'
           <div class="form-text"></div>
         </div>
         <div class="mb-3">
-          <label for="price" class="form-label">商品商品價格</label>
-          <input type="number" class="form-control" id="price" name="price" min="0" max="99999">
+          <label for="price" class="form-label">商品價格</label>
+          <input type="number" class="form-control" id="price" name="price">
           <div class="form-text"></div>
         </div>
         <!-- 商品分類 下拉式選單 -->
@@ -67,8 +67,8 @@ $title = '新增商品'
           <label for="sale">下架</label>
         </div>
         <div class="d-flex justify-content-end">
-          <button type="submit" onsubmit="sendData(event)" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
-          <button type="submit" onsubmit="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
+          <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
+          <button type="button" onsubmit="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
         </div>
       </form>
     </div>
@@ -87,23 +87,23 @@ $title = '新增商品'
   const moreImg = document.form1.moreImg;
   const inventory = document.form1.inventory;
   const sale = document.form1.inventory.value;
-  const fields = [name_in, price_in, category, mainImg, moreImg, inventory, sale];
+  const fields = [name_in, price_in, inventory];
 
   // 宣告商品類別
   let product_category = [
     {
       "category": "物品",
       "subCategory":[
-        {v: 1, name: "服裝"},
-        {v: 2, name: "器材"},
-        {v: 3, name: "裝備"},
+        {v: "A", name: "服裝"},
+        {v: "B", name: "器材"},
+        {v: "C", name: "裝備"},
       ]
     },
     {
       "category": "食品",
       "subCategory":[
-        {v: 4, name: "蛋白"},
-        {v: 5, name: "非蛋白"},
+        {v: "D", name: "蛋白"},
+        {v: "E", name: "非蛋白"},
       ]
     }
   ];
@@ -128,7 +128,7 @@ $.each(product_category, function(index, value){
   // 當選到類別
   if (selectedPc) {
     $.each(selectedPc.subCategory, function(index, value2){
-    console.log(value2);
+    // console.log(value2);
     $("#subCategory").append(`<option value="${value2.v}" >${value2.name}</option>`)
     // console.log(selectedPc);
     })
@@ -146,16 +146,16 @@ $.each(product_category, function(index, value){
     // 外觀要回復原來的狀態
     fields.forEach(field => {
       field.style.border = '1px solid #CCCCCC';
-      field.nextElementSibling.innerHTML = '';
+      if (field.nextElementSibling){
+        field.nextElementSibling.innerHTML = '';
+      }
     })
 
     // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
 
-    // 1.商品編號給數字
-    // for () {
-
-    // }
+    // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
+    
 
     // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
@@ -164,12 +164,15 @@ $.each(product_category, function(index, value){
       name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
     }
 
-    // moreImg 非必填: 如果沒有值因為是非必填是ok的就不做 && 後面的事，如果有值 且 正規驗證為沒有值
-    // if (moreImg.value) {
-    //   $isPass = false;
-    //   mobile_in.style.border = '2px solid red';
-    //   mobile_in.nextElementSibling.innerHTML = '請填寫正確的手機號碼';
-    // }
+    //3.price 如果價格<1 就不是正確值
+    if (price_in.value <= 0) {
+      isPass = false;
+      price_in.style.border = '2px solid red';
+      price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
+    }
+
+    // moreImg 非必填: 是否要判別跟主圖片一樣就提醒
+    
     
     // 沒有通過就不要發送資料
     if (!isPass) {
