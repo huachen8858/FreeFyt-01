@@ -48,6 +48,7 @@ $title = '新增商品'
         <!-- 商品圖片 -->
         <div class="mb-3">
           <label for="mainImg" class="form-label">主要商品圖片</label>
+          <p>(建議 600 x 600px, 檔案大小 500K 以內)</p>
           <input type="file" class="form-control" name="mainImg" id="img">
           </div>
         <div class="mb-3">
@@ -93,20 +94,23 @@ $title = '新增商品'
     {
       "category": "物品",
       "subCategory":[
-        "服裝","器材","裝備"
+        {v: 1, name: "服裝"},
+        {v: 2, name: "器材"},
+        {v: 3, name: "裝備"},
       ]
     },
     {
       "category": "食品",
       "subCategory":[
-        "蛋白","非蛋白"
+        {v: 4, name: "蛋白"},
+        {v: 5, name: "非蛋白"},
       ]
     }
   ];
   
 // 下拉式選單 串接子選項
 $.each(product_category, function(index, value){
-  $("#category").append(`<option>${value.category}</option>`)
+  $("#category").append(`<option value="${index+1}">${value.category}</option>`)
   })
 
   // 先選到類別名，在第二個下拉式選單顯示該類別名的子選項
@@ -116,15 +120,16 @@ $.each(product_category, function(index, value){
     
     $("#subCategory").empty();
     // 商品類別是陣列 陣列的item是內容要對到他的類別名
-    let selectedPc = product_category.find(function(item){
-        return item.category === selectedCategory;
-    })
+    // let selectedPc = product_category.find(function(item){
+    //     return item.category === selectedCategory;
+    // })
+    let selectedPc = product_category[selectedCategory - 1];
 
   // 當選到類別
   if (selectedPc) {
     $.each(selectedPc.subCategory, function(index, value2){
-    // console.log(value2);
-    $("#subCategory").append(`<option>${value2}</option>`)
+    console.log(value2);
+    $("#subCategory").append(`<option value="${value2.v}" >${value2.name}</option>`)
     // console.log(selectedPc);
     })
   }
@@ -147,7 +152,12 @@ $.each(product_category, function(index, value){
     // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
 
-    // 判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
+    // 1.商品編號給數字
+    // for () {
+
+    // }
+
+    // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
       $isPass = false;
       name_in.style.border = '2px solid red';
