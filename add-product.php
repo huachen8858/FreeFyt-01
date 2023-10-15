@@ -21,8 +21,8 @@ $title = '新增商品'
       <hr>
       <form name="form1">
         <div class="mb-3">
-          <label for="sid" class="form-label">商品編號</label>
-          <input type="text" class="form-control" id="sid" name="sid" disabled placeholder="Pxxxx (待確認新增商品後會自動生成)">
+          <label for="product_id" class="form-label">商品編號</label>
+          <input type="text" class="form-control" id="product_id" name="product_id" disabled placeholder="Pxxxx (待確認新增商品後會自動生成)">
           <div class="form-text"></div>
         </div>
         <div class="mb-3">
@@ -39,11 +39,11 @@ $title = '新增商品'
         <div class="mb-3">
           <label for="category" class="form-label">商品分類</label>
           <select name="category" id="category" class="form-control">
-            <option value="1">物品</option>
-            <option value="2">食品</option>
+            <!-- <option value="1">物品</option>
+            <option value="2">食品</option> -->
           </select>
-          <select name="category" id="category" class="form-control">
-            
+          <select name="subCategory" id="subCategory" class="form-control">
+          
           </select>
           <div class="form-text"></div>
         </div>
@@ -62,14 +62,14 @@ $title = '新增商品'
         </div>
         <div class="mb-3">
           <label for="sale" class="form-label">上架狀態</label>&nbsp;
-          <input type="radio" id="on" name="sale" value="1">
+          <input type="radio" id="on" name="sale" value="1" checked>
           <label for="sale">上架</label>&nbsp;
           <input type="radio" id="on" name="sale" value="0">
           <label for="sale">下架</label>
         </div>
         <div class="d-flex justify-content-end">
-          <button name="add" type="submit" onsubmit="sendData(event)" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
-          <button name="cancel" type="submit" onsubmit="cancelSend(event)" class="btn btn-secondary rounded-pill">取消編輯</button>
+          <button type="submit" onsubmit="sendData(event)" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
+          <button type="submit" onsubmit="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
         </div>
       </form>
     </div>
@@ -82,9 +82,35 @@ $title = '新增商品'
 <script>
   // 先拿到欄位參照，因為一開始是空的 沒有值
   const name_in = document.form1.name;
-  const email_in = document.form1.email;
-  const mobile_in = document.form1.mobile;
-  const fields = [name_in, email_in, mobile_in];
+  const price_in = document.form1.price;
+  const category = document.form1.catogory;
+  const mainImg = document.form1.mainImg;
+  const moreImg = document.form1.moreImg;
+  const inventory = document.form1.inventory;
+  const sale = document.form1.inventory.value;
+  const fields = [name_in, price_in, category, mainImg, moreImg, inventory, sale];
+
+  // 宣告商品類別
+  let product_catogory = [
+    {
+      "catogory": "物品",
+      "subCatogory":[
+        "服裝","器材","裝備"
+      ]
+    },
+    {
+      "catogory": "食品",
+      "subCatogory":[
+        "蛋白","非蛋白"
+      ]
+    }
+  ];
+  
+// 下拉式選單 串接子選項
+
+
+
+
 
 
 // 按下送出按鈕要執行以下
@@ -100,26 +126,19 @@ $title = '新增商品'
     // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
 
-    // 判斷姓名需大於兩個字:如果長度小於二就是資訊有誤
+    // 判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
       $isPass = false;
       name_in.style.border = '2px solid red';
-      name_in.nextElementSibling.innerHTML = '請填寫正確的姓名';
+      name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
     }
 
-    // 判斷 email 須符合正規格式：正規有值就正確，正規沒有值就是資訊有誤
-    if (!validateEmail(email_in.value)) {
-      $isPass = false;
-      email_in.style.border = '2px solid red';
-      email_in.nextElementSibling.innerHTML = '請填寫正確的email';
-    }
-
-    // mobile 非必填: 如果沒有值因為是非必填是ok的就不做 && 後面的事，如果有值 且 正規驗證為沒有值
-    if (mobile_in.value && !validateMobile(mobile_in.value)) {
-      $isPass = false;
-      mobile_in.style.border = '2px solid red';
-      mobile_in.nextElementSibling.innerHTML = '請填寫正確的手機號碼';
-    }
+    // moreImg 非必填: 如果沒有值因為是非必填是ok的就不做 && 後面的事，如果有值 且 正規驗證為沒有值
+    // if (moreImg.value) {
+    //   $isPass = false;
+    //   mobile_in.style.border = '2px solid red';
+    //   mobile_in.nextElementSibling.innerHTML = '請填寫正確的手機號碼';
+    // }
     
     // 沒有通過就不要發送資料
     if (!isPass) {
@@ -130,7 +149,7 @@ $title = '新增商品'
     const fd = new FormData(document.form1);
 
     // 只要有資料傳送時或是想暫存資料就可以用 AJAX 方式去叫小弟做事 fetch 這支 add-api.php
-    fetch ('add-api.php', {
+    fetch ('add-product-api.php', {
       method: 'POST',
       body: fd, // 送出資料格式會自動是mutipart/form-data
     }).then(r => r.json())
@@ -142,5 +161,14 @@ $title = '新增商品'
     .catch(ex => console.log(ex))
   }
 
+
+
+  // 取消新增
+  function cancelSend() {
+    if (confirm(`確定要取消新增資料嗎？`)) {
+      document.form1.reset();
+      location.href = 'product_list.php';
+    }
+  }
 </script>
 <?php include './index-parts/html-foot.php' ?>

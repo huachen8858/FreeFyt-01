@@ -49,7 +49,7 @@ if ($totalRows > 0) {
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h5 class="m-0 font-weight-bold text-primary">總商品列表</h5>
             <div class="btn btn-primary rounded-pill">
-                <a class=" text-light" href="add-product.php"><i class="fas fa-plus"></i> 新增商品</a>
+                <a class="text-light" href="add-product.php"><i class="fas fa-plus"></i> 新增商品</a>
         </div>
     </div>
     <div class="card-body">
@@ -77,7 +77,9 @@ if ($totalRows > 0) {
                         <td><?= $r['product_id'] ?></td>
                         <td><?= $r['name'] ?></td>
                         <td><?= $r['price'] ?></td>
-                        <td class="" ><?= $r['descriptions'] ?></td>
+                        <!-- 隱藏多於文字text-truncate??? -->
+                        <td class=""><?= $r['descriptions'] ?></td>
+                        
                         <td><?= $r['inventory'] ?></td>
                         <td><?= $r['purchase_qty'] ?></td>
                         <td><?= $r['create_date'] ?></td>
@@ -94,6 +96,7 @@ if ($totalRows > 0) {
             </table>
         </div>
     </div>
+    <!-- 總列數/總頁數 -->
     <div><?= "$totalRows / $totalPages" ?></div>
 
     <!-- pagination:還沒調整完 -->
