@@ -39,11 +39,9 @@ $title = '新增商品'
         <div class="mb-3">
           <label for="category" class="form-label">商品分類</label>
           <select name="category" id="category" class="form-control">
-            <!-- <option value="1">物品</option>
-            <option value="2">食品</option> -->
+            <option value="0">-- 請選擇類別 --</option>
           </select>
           <select name="subCategory" id="subCategory" class="form-control">
-          
           </select>
           <div class="form-text"></div>
         </div>
@@ -91,23 +89,46 @@ $title = '新增商品'
   const fields = [name_in, price_in, category, mainImg, moreImg, inventory, sale];
 
   // 宣告商品類別
-  let product_catogory = [
+  let product_category = [
     {
-      "catogory": "物品",
-      "subCatogory":[
+      "category": "物品",
+      "subCategory":[
         "服裝","器材","裝備"
       ]
     },
     {
-      "catogory": "食品",
-      "subCatogory":[
+      "category": "食品",
+      "subCategory":[
         "蛋白","非蛋白"
       ]
     }
   ];
   
 // 下拉式選單 串接子選項
+$.each(product_category, function(index, value){
+  $("#category").append(`<option>${value.category}</option>`)
+  })
 
+  // 先選到類別名，在第二個下拉式選單顯示該類別名的子選項
+  $("#category").on("change",function(){
+    let selectedCategory = $(this).val();
+    // console.log($(this).val());
+    
+    $("#subCategory").empty();
+    // 商品類別是陣列 陣列的item是內容要對到他的類別名
+    let selectedPc = product_category.find(function(item){
+        return item.category === selectedCategory;
+    })
+
+  // 當選到類別
+  if (selectedPc) {
+    $.each(selectedPc.subCategory, function(index, value2){
+    // console.log(value2);
+    $("#subCategory").append(`<option>${value2}</option>`)
+    // console.log(selectedPc);
+    })
+  }
+})
 
 
 
