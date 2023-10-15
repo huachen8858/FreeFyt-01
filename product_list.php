@@ -82,9 +82,9 @@ if ($totalRows > 0) {
                         <td><?= $r['purchase_qty'] ?></td>
                         <td><?= $r['create_date'] ?></td>
                         <?php if(!$r['sale']) : ?>
-                        <td><div class="btn btn-success rounded-pill">上架中</div></td>
-                        <?php else : ?>
                         <td><div class="btn btn-secondary rounded-pill">未上架</div></td>
+                        <?php else : ?>
+                        <td><div class="btn btn-success rounded-pill">上架中</div></td>
                         <?php endif; ?>
                         <td><a href="javascript: deleteItem(<?= $r['sid'] ?>)"><i class="far fa-trash-alt"></a></td>
                         <td><a href="edit-product.php"><i class="far fa-edit"></a></td>
