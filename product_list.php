@@ -1,7 +1,7 @@
 <?php
 require './index-parts/connect_db.php';
 $title = '商品管理系統';
-$perPage = 10;
+$perPage = 5;
 
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 if ($page < 1) {
@@ -22,25 +22,26 @@ $rows = [];
 
 # 有資料時
 if ($totalRows > 0) {
-      # 總頁數
-      $totalPages = ceil($totalRows / $perPage);
-      if ($page > $totalPages) {
-            header('Location: ?page=' . $totalPages);
-            exit;
-      };
+    # 總頁數
+    $totalPages = ceil($totalRows / $perPage);
+    if ($page > $totalPages) {
+        header('Location: ?page=' . $totalPages);
+        exit;
+    };
 
-      $sql = sprintf(
-            "SELECT * FROM product ORDER BY sid DESC LIMIT %s, %s",
-            ($page - 1) * $perPage, # 第1頁 * 0 *25 = 0
-            $perPage # 選25筆
-      );
-      $rows = $pdo->query($sql)->fetchAll();
+    $sql = sprintf(
+        "SELECT * FROM product ORDER BY sid DESC LIMIT %s, %s",
+        ($page - 1) * $perPage, 
+        $perPage 
+    );
+    $rows = $pdo->query($sql)->fetchAll();
 }
 
 ?>
 
 <?php include './index-parts/html-head.php' ?>
 <?php include './index-parts/sidebartoTopbar.php' ?>
+
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">商品管理</h1>
 
@@ -76,18 +77,25 @@ if ($totalRows > 0) {
                         <td><?= $r['product_id'] ?></td>
                         <td><?= $r['name'] ?></td>
                         <td><?= $r['price'] ?></td>
-                        <td><?= $r['descriptions'] ?></td>
-                        <td>56</td>
-                        <td>33</td>
-                        <td>2011/04/25</td>
+                        <td class="" ><?= $r['descriptions'] ?></td>
+                        <td><?= $r['inventory'] ?></td>
+                        <td><?= $r['purchase_qty'] ?></td>
+                        <td><?= $r['create_date'] ?></td>
+                        <?php if(!$r['sale']) : ?>
                         <td><div class="btn btn-success rounded-pill">上架中</div></td>
+                        <?php else : ?>
+                        <td><div class="btn btn-secondary rounded-pill">未上架</div></td>
+                        <?php endif; ?>
                         <td><a href="javascript: deleteItem(<?= $r['sid'] ?>)"><i class="far fa-trash-alt"></a></td>
                         <td><a href="edit-product.php"><i class="far fa-edit"></a></td>
                     </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     </div>
+    <div><?= "$totalRows / $totalPages" ?></div>
+
     <!-- pagination:還沒調整完 -->
     <div class="raw">
         <div class="col d-flex justify-content-end">
