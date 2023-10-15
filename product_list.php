@@ -1,5 +1,41 @@
 <?php
+require './index-parts/connect_db.php';
 $title = '商品管理系統';
+$perPage = 10;
+
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+if ($page < 1) {
+    header('Location: ?page=1');
+    exit; # 結束這支php
+}
+
+# 算筆數
+$t_sql = "SELECT COUNT(1) FROM product";
+
+# 總筆數
+$totalRows = $pdo->query($t_sql)->fetch(PDO::FETCH_NUM)[0];
+
+
+# 預設值
+$totalPages = 0;
+$rows = [];
+
+# 有資料時
+if ($totalRows > 0) {
+      # 總頁數
+      $totalPages = ceil($totalRows / $perPage);
+      if ($page > $totalPages) {
+            header('Location: ?page=' . $totalPages);
+            exit;
+      };
+
+      $sql = sprintf(
+            "SELECT * FROM product ORDER BY sid DESC LIMIT %s, %s",
+            ($page - 1) * $perPage, # 第1頁 * 0 *25 = 0
+            $perPage # 選25筆
+      );
+      $rows = $pdo->query($sql)->fetchAll();
+}
 
 ?>
 
@@ -34,17 +70,18 @@ $title = '商品管理系統';
                     </tr>
                 </thead>
                 <tbody>
+                    <?php foreach($rows as $r) :?>
                     <tr>
-                        <td>#</td>
-                        <td>P001</td>
-                        <td>dumbbell</td>
-                        <td>1380</td>
-                        <td>description</td>
+                        <td><?= $r['sid'] ?></td>
+                        <td><?= $r['product_id'] ?></td>
+                        <td><?= $r['name'] ?></td>
+                        <td><?= $r['price'] ?></td>
+                        <td><?= $r['descriptions'] ?></td>
                         <td>56</td>
                         <td>33</td>
                         <td>2011/04/25</td>
                         <td><div class="btn btn-success rounded-pill">上架中</div></td>
-                        <td><a href="delete-product.php"><i class="far fa-trash-alt"></a></td>
+                        <td><a href="javascript: deleteItem(<?= $r['sid'] ?>)"><i class="far fa-trash-alt"></a></td>
                         <td><a href="edit-product.php"><i class="far fa-edit"></a></td>
                     </tr>
                 </tbody>
@@ -79,4 +116,11 @@ $title = '商品管理系統';
 
 </div>
 <?php include './index-parts/footerToScripts.php' ?>
+<script>
+    function deleteItem(sid) {
+        if (confirm(`確定要刪除編號 ${sid} 的資料嗎?`)) {
+            location.href = 'delete.php?sid=' + sid;
+        }
+    }
+</script>
 <?php include './index-parts/html-foot.php' ?>
