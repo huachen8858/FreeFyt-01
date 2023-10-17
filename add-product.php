@@ -92,7 +92,7 @@ $title = '新增商品';
         </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
         <form name="moreImgForm" hidden>
-          <input type="file" name="moreImg" onchange="uploadMoreImg()" />
+          <input type="file" name="moreImg" onchange="uploadMoreImg()" multiple/>
         </form>
       </div>
     </div>
@@ -107,7 +107,8 @@ $title = '新增商品';
   const price_in = document.form1.price;
   const category = document.form1.catogory;
   const mainImg = document.form1.mainImg;
-  const moreImg = document.moreImgForm.moreImg;
+  const mainImg_hidden = document.mainImgForm.mainImg;
+  const moreImg = document.form1.moreImg;
   const inventory = document.form1.inventory;
   const launch = document.form1.launch.value;
   const fields = [name_in, price_in, inventory];
@@ -172,22 +173,25 @@ $title = '新增商品';
   })
 
 // ---- 上傳一張圖片
+if (mainImg_hidden.value !== 0) {
   function uploadMainImg(event) {
         const fd = new FormData(document.mainImgForm);
 
         // 如果其他欄位有值就上傳圖片
-
         fetch("upload-img-api-1.php", {
           method: "POST",
           body: fd, // enctype="multipart/form-data"
         })
           .then((r) => r.json())
           .then((data) => {
+            // 如果data(output)有值就預覽
             if (data.success) {
               mainImg.src = "/Only5/product-imgs/" + data.file;
             }
           });
       }
+}
+  
 
   // ---- 按下送出按鈕要執行以下
   function sendData(e) {
@@ -242,8 +246,6 @@ $title = '新增商品';
       isPass = false;
       mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
     }
-
-    
 
     // 8.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
 
