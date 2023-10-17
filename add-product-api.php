@@ -12,7 +12,7 @@ $output =[
 header('Content-Type: application/json');
 
 // 資料寫入前要檢查: 除更多圖片其他欄位必填
-if (empty($_POST['name']) or empty($_POST['price']) or empty($_POST['category']) or empty($_POST['subCategory']) or empty($_POST['mainImg']) or empty($_POST['inventory']) or empty($_POST['sale'])) {
+if (empty($_POST['name']) or empty($_POST['price']) or empty($_POST['category']) or empty($_POST['subCategory']) or empty($_POST['mainImg']) or empty($_POST['inventory']) or empty($_POST['launch'])) {
   $output['errors']['form'] = '缺少欄位資料';
   echo json_encode($output);
   exit;
@@ -26,14 +26,14 @@ $subCcategory = $_POST['subCategory'];
 $mainImg = $_POST['mainImg'];
 $moreImg = $_POST['moreImg'] ?? '';
 $inventory = $_POST['inventory'];
-$sale = $_POST['sale'];
+$launch = $_POST['launch'];
 
 # 後端檢查
 // $isPass = true;
 
-//如果庫存量為0,sale設定為0
+//如果庫存量為0,launch設定為0
 if (intval($inventory) === 0) {
-  $sale = 0;
+  $launch = 0;
 }
 
 // 如果沒有通過檢查
@@ -45,7 +45,7 @@ if(! $isPass) {
 # 與資料庫串接
 // 新增功能： ?用來佔位
 $sql = "INSERT INTO `product`(
-  `product_id`, `name`, `price`, `category`, `subCategory`, `inventory`, `sale`, `created_date`
+  `product_id`, `name`, `price`, `category`, `subCategory`, `inventory`, `launch`, `created_date`
   ) VALUES (
     $pid, ?, ?, ?, ?, ?, NOW()
   )";
@@ -60,8 +60,24 @@ $stmt->execute([
   $category,
   $subCategory,
   $inventory,
-  $sale 
+  $launch 
 ]);
+
+//將圖片檔名存到資料庫的欄位??????????
+
+$sql2 = "INSERT INTO `product_detail`(`sid`, `product_id`, `img`, `sale`, `inventory`, `purchase_qty`, `create_date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]')";
+
+$stmt2 = $pdo->prepare($sql2);
+
+$stmt2->execute([
+  $name,
+  $price,
+  $category,
+  $subCategory,
+  $inventory,
+  $launch 
+]);
+
 
 // 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
 $output['success'] = boolval($stmt->rowCount());
