@@ -53,23 +53,28 @@ $title = '新增商品';
             </div>
             <!-- 是否上架 -->
             <div class="mb-3">
-              <label for="sale" class="form-label">上架狀態</label>&nbsp;
-              <input type="radio" id="on" name="sale" value="1" checked>
-              <label for="sale">上架</label>&nbsp;
-              <input type="radio" id="on" name="sale" value="0">
-              <label for="sale">下架</label>
+              <label for="launch" class="form-label">上架狀態</label>&nbsp;
+              <input type="radio" id="on" name="launch" value="1" checked>
+              <label for="launch">上架</label>&nbsp;
+              <input type="radio" id="on" name="launch" value="0">
+              <label for="launch">下架</label>
             </div>
             <!-- 主要商品圖片:假的上傳按鈕 -->
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議 600 x 600px, 檔案大小 500K 以內)</p>
+              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
               <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
+              <div style="width: 300px">
+                <div class="showMainImg">
+                  <!-- <img src="" alt="" id="mainImg" width="100%"/> -->
+                </div>
+              </div>
             </div>
             <!-- 更多商品圖片 -->
             <div class="mb-3">
               <label for="moreImg" class="form-label">更多商品圖片</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議 600 x 600px, 檔案大小 500K 以內)</p>
+              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
               <div class="btn btn-secondary" style="cursor: pointer" onclick="document.moreImgForm.moreImg.click()">點擊上傳更多圖片</div>
               <div class="form-text"></div>
             </div>
@@ -82,7 +87,7 @@ $title = '新增商品';
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
         <form name="mainImgForm" hidden>
-          <input type="file" name="mainImg" onchange="uploadMainImg()">
+          <input type="file" name="mainImg" onchange="uploadMainImg(event)">
         </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
         <form name="moreImgForm" hidden>
@@ -100,11 +105,12 @@ $title = '新增商品';
   const name_in = document.form1.name;
   const price_in = document.form1.price;
   const category = document.form1.catogory;
-  const mainImg = document.form1.mainImg;
-  const moreImg = document.form1.moreImg;
+  const mainImg = document.mainImgForm.mainImg;
+  const moreImg = document.moreImgForm.moreImg;
   const inventory = document.form1.inventory;
-  const sale = document.form1.inventory.value;
+  const launch = document.form1.launch.value;
   const fields = [name_in, price_in, inventory];
+  const showMainImg = document.querySelector('.showMainImg');
 
   // 宣告商品類別
   let product_category = [{
@@ -164,8 +170,25 @@ $title = '新增商品';
     }
   })
 
+// ---- 上傳一張圖片
+  function uploadMainImg(event) {
+        const fd = new FormData(document.mainImgForm);
 
-  // 按下送出按鈕要執行以下
+        fetch("upload-img-api-1.php", {
+          method: "POST",
+          body: fd, // enctype="multipart/form-data"
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success) {
+              let str = '';
+              str = `<img src="/product-imgs/"+ ${data.file} alt="" id="mainImg" width="100%"/`;
+              document.querySelector('.showMainImg').innerHTML = str;
+            }
+          });
+      }
+
+  // ---- 按下送出按鈕要執行以下
   function sendData(e) {
     e.preventDefault();
 
@@ -204,22 +227,27 @@ $title = '新增商品';
     //   category.nextElementSibling.innerHTML = '請選擇商品類別';
     // }
 
-    // 5.mainImg 如果圖片沒有值 代表資料有誤
-    if (!mainImg.value) {
-      isPass = false;
-      mainImg.style.border = '2px solid red';
-      mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
-    }
-
-    // 6.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
-
-
-    // 7.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
+    // 5.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
     if (!inventory.value || inventory.value < 0) {
       isPass = false;
       inventory.style.border = '2px solid red';
       inventory.nextElementSibling.innerHTML = '請填寫庫存';
     }
+    
+    // 6.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
+
+    // 7.mainImg 如果圖片沒有值 代表資料有誤
+    // if (!mainImg.value) {
+    //   isPass = false;
+    //   mainImg.style.border = '2px solid red';
+    //   mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
+    // }
+
+    
+
+    // 8.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
+
+    
 
     // 沒有通過就不要發送資料
     if (!isPass) {
@@ -241,7 +269,6 @@ $title = '新增商品';
       })
       .catch(ex => console.log(ex))
   }
-
 
 
   // 取消新增
