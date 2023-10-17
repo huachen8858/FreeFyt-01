@@ -65,15 +65,16 @@ $title = '新增商品';
               <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
               <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
-              <div style="width: 300px">
-                <div class="showMainImg">
-                  <!-- <img src="" alt="" id="mainImg" width="100%"/> -->
-                </div>
+              <div class="showMainImg" style="width: 300px">
+                <?php if (isset($_POST['$mainImg'])): ?>
+                  <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
+                <?php endif; ?>
+                  <img id="mainImg" name="mainImg" width="100%" class="display: none"/>
               </div>
             </div>
             <!-- 更多商品圖片 -->
             <div class="mb-3">
-              <label for="moreImg" class="form-label">更多商品圖片</label>
+              <label for="moreImg" class="form-label">更多商品圖片(非必填)</label>
               <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
               <div class="btn btn-secondary" style="cursor: pointer" onclick="document.moreImgForm.moreImg.click()">點擊上傳更多圖片</div>
               <div class="form-text"></div>
@@ -105,7 +106,7 @@ $title = '新增商品';
   const name_in = document.form1.name;
   const price_in = document.form1.price;
   const category = document.form1.catogory;
-  const mainImg = document.mainImgForm.mainImg;
+  const mainImg = document.form1.mainImg;
   const moreImg = document.moreImgForm.moreImg;
   const inventory = document.form1.inventory;
   const launch = document.form1.launch.value;
@@ -174,6 +175,8 @@ $title = '新增商品';
   function uploadMainImg(event) {
         const fd = new FormData(document.mainImgForm);
 
+        // 如果其他欄位有值就上傳圖片
+
         fetch("upload-img-api-1.php", {
           method: "POST",
           body: fd, // enctype="multipart/form-data"
@@ -181,9 +184,7 @@ $title = '新增商品';
           .then((r) => r.json())
           .then((data) => {
             if (data.success) {
-              let str = '';
-              str = `<img src="/product-imgs/"+ ${data.file} alt="" id="mainImg" width="100%"/`;
-              document.querySelector('.showMainImg').innerHTML = str;
+              mainImg.src = "/Only5/product-imgs/" + data.file;
             }
           });
       }
@@ -237,11 +238,10 @@ $title = '新增商品';
     // 6.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
 
     // 7.mainImg 如果圖片沒有值 代表資料有誤
-    // if (!mainImg.value) {
-    //   isPass = false;
-    //   mainImg.style.border = '2px solid red';
-    //   mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
-    // }
+    if (!mainImg.value) {
+      isPass = false;
+      mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
+    }
 
     
 
@@ -271,7 +271,7 @@ $title = '新增商品';
   }
 
 
-  // 取消新增
+  //---- 取消新增
   function cancelSend() {
     if (confirm(`確定要取消新增資料嗎？`)) {
       document.form1.reset();
