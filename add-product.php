@@ -103,6 +103,19 @@ $title = '新增商品';
   const fields = [name_in, price_in, inventory];
   const showMainImg = document.querySelector('.showMainImg');
 
+
+
+  // 預覽圖片 createObjectURL
+  let previewImg = (event) => {
+    let myimg = document.querySelector('#myimg');
+        const el = event.target;
+        myimg.src = URL.createObjectURL(el.files[0]);
+        // console.log(el.files); // 會拿到FileList
+        myimg.onload = function () {
+          URL.revokeObjectURL(myimg.src);
+        } 
+      };
+
   // 宣告商品類別
   let product_category = [{
       "category": "物品",
@@ -161,12 +174,7 @@ $title = '新增商品';
     }
   })
 
-  // 預覽圖片 createObjectURL
-  const previewImg = (event) => {
-        const el = event.currentTarget;
-        myimg.src = URL.createObjectURL(el.files[0]);
-        // console.log(el.files); // 會拿到FileList
-      };
+
 
   // ---- 上傳一張圖片 傳到api: 
   // if (mainImg_hidden.value !== 0) {
