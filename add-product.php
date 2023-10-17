@@ -5,7 +5,7 @@ $title = '新增商品';
 
 ?>
 <style>
-  form .form-text{
+  form .form-text {
     color: red;
   }
 </style>
@@ -15,69 +15,83 @@ $title = '新增商品';
 <div class="container mb-4">
   <div class="row">
     <div class="col">
-    <div class="card">
-    <div class="card-body">
-      <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
-      <hr>
-      <form name="form1" onsubmit="sendData(event)">
-        <div class="mb-3">
-          <label for="product_id" class="form-label">商品編號</label>
-          <input type="text" class="form-control" id="product_id" name="product_id" disabled placeholder="Pxxxx (待確認新增商品後會自動生成)">
-          <div class="form-text"></div>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
+          <hr>
+          <form name="form1" onsubmit="sendData(event)">
+            <div class="mb-3">
+              <label for="product_id" class="form-label">商品編號</label>
+              <input type="text" class="form-control" id="product_id" name="product_id" disabled placeholder="Pxxxx (待確認新增商品後會自動生成)">
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="name" class="form-label">商品名稱</label>
+              <input type="text" class="form-control" id="name" name="name">
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="price" class="form-label">商品價格</label>
+              <input type="number" class="form-control" id="price" name="price">
+              <div class="form-text"></div>
+            </div>
+            <!-- 商品分類 下拉式選單 -->
+            <div class="mb-3">
+              <label for="category" class="form-label">商品分類</label>
+              <select name="category" id="category" class="form-control">
+                <option value="0">-- 請選擇類別 --</option>
+              </select>
+              <select name="subCategory" id="subCategory" class="form-control">
+              </select>
+              <div class="form-text"></div>
+            </div>
+            <!-- 庫存數量 -->
+            <div class="mb-3">
+              <label for="inventory" class="form-label">庫存數量</label>
+              <input type="number" class="form-control" id="inventory" mobile="inventory">
+              <div class="form-text"></div>
+            </div>
+            <!-- 是否上架 -->
+            <div class="mb-3">
+              <label for="sale" class="form-label">上架狀態</label>&nbsp;
+              <input type="radio" id="on" name="sale" value="1" checked>
+              <label for="sale">上架</label>&nbsp;
+              <input type="radio" id="on" name="sale" value="0">
+              <label for="sale">下架</label>
+            </div>
+            <!-- 主要商品圖片:假的上傳按鈕 -->
+            <div class="mb-3">
+              <label for="mainImg" class="form-label">主要商品圖片</label>
+              <p class="form-text text-secondary" style="font-size: 14px">(建議 600 x 600px, 檔案大小 500K 以內)</p>
+              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
+              <div class="form-text"></div>
+            </div>
+            <!-- 更多商品圖片 -->
+            <div class="mb-3">
+              <label for="moreImg" class="form-label">更多商品圖片</label>
+              <p class="form-text text-secondary" style="font-size: 14px">(建議 600 x 600px, 檔案大小 500K 以內)</p>
+              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.moreImgForm.moreImg.click()">點擊上傳更多圖片</div>
+              <div class="form-text"></div>
+            </div>
         </div>
-        <div class="mb-3">
-          <label for="name" class="form-label">商品名稱</label>
-          <input type="text" class="form-control" id="name" name="name">
-          <div class="form-text"></div>
-        </div>
-        <div class="mb-3">
-          <label for="price" class="form-label">商品價格</label>
-          <input type="number" class="form-control" id="price" name="price">
-          <div class="form-text"></div>
-        </div>
-        <!-- 商品分類 下拉式選單 -->
-        <div class="mb-3">
-          <label for="category" class="form-label">商品分類</label>
-          <select name="category" id="category" class="form-control">
-            <option value="0">-- 請選擇類別 --</option>
-          </select>
-          <select name="subCategory" id="subCategory" class="form-control">
-          </select>
-          <div class="form-text"></div>
-        </div>
-        <!-- 商品圖片 -->
-        <div class="mb-3">
-          <label for="mainImg" class="form-label">主要商品圖片</label>
-          <p>(建議 600 x 600px, 檔案大小 500K 以內)</p>
-          <input type="file" class="form-control" name="mainImg" id="img">
-          <div class="form-text"></div>
-        </div>
-        <div class="mb-3">
-          <label for="moreImg" class="form-label">更多商品圖片</label>
-          <input type="file" class="form-control" name="moreImg" id="moreImg" multiple>
-          <div class="form-text"></div>
-        </div>
-        <div class="mb-3">
-          <label for="inventory" class="form-label">庫存數量</label>
-          <input type="number" class="form-control" id="inventory" mobile="inventory">
-          <div class="form-text"></div>
-        </div>
-        <div class="mb-3">
-          <label for="sale" class="form-label">上架狀態</label>&nbsp;
-          <input type="radio" id="on" name="sale" value="1" checked>
-          <label for="sale">上架</label>&nbsp;
-          <input type="radio" id="on" name="sale" value="0">
-          <label for="sale">下架</label>
-        </div>
-        <div class="d-flex justify-content-end">
+        <!-- 新增商品／取消新增商品 按鈕 -->
+        <div class="d-flex justify-content-center mb-3">
           <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
           <button type="button" onclick="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
         </div>
-      </form>
-    </div>
-    </div>
+        </form>
+        <!-- 單一圖片上傳的表單(hidden) -->
+        <form name="mainImgForm" hidden>
+          <input type="file" name="mainImg" onchange="uploadMainImg()">
+        </form>
+        <!-- 多張圖片上傳的表單(hidden)  -->
+        <form name="moreImgForm" hidden>
+          <input type="file" name="moreImg" onchange="uploadMoreImg()" />
+        </form>
+      </div>
     </div>
   </div>
+</div>
 </div>
 
 <?php include './index-parts/footerToScripts.php' ?>
@@ -93,34 +107,46 @@ $title = '新增商品';
   const fields = [name_in, price_in, inventory];
 
   // 宣告商品類別
-  let product_category = [
-    {
+  let product_category = [{
       "category": "物品",
-      "subCategory":[
-        {v: "A", name: "服裝"},
-        {v: "B", name: "器材"},
-        {v: "C", name: "裝備"},
+      "subCategory": [{
+          v: "A",
+          name: "服裝"
+        },
+        {
+          v: "B",
+          name: "器材"
+        },
+        {
+          v: "C",
+          name: "裝備"
+        },
       ]
     },
     {
       "category": "食品",
-      "subCategory":[
-        {v: "D", name: "蛋白"},
-        {v: "E", name: "非蛋白"},
+      "subCategory": [{
+          v: "D",
+          name: "蛋白"
+        },
+        {
+          v: "E",
+          name: "非蛋白"
+        },
       ]
     }
   ];
-  
-// 下拉式選單 串接子選項
-$.each(product_category, function(index, value){
-  $("#category").append(`<option value="${index+1}">${value.category}</option>`)
+
+  // 下拉式選單 串接子選項
+  $.each(product_category, function(index, value) {
+    $("#category").append(`<option value="${index+1}">${value.category}</option>`)
   })
 
   // 先選到類別名，在第二個下拉式選單顯示該類別名的子選項
-  $("#category").on("change",function(){
+  $("#category").on("change", function() {
     let selectedCategory = $(this).val();
     // console.log($(this).val());
-    
+
     $("#subCategory").empty();
     // 商品類別是陣列 陣列的item是內容要對到他的類別名
     // let selectedPc = product_category.find(function(item){
@@ -128,25 +154,25 @@ $.each(product_category, function(index, value){
     // })
     let selectedPc = product_category[selectedCategory - 1];
 
-  // 當選到類別
-  if (selectedPc) {
-    $.each(selectedPc.subCategory, function(index, value2){
-    // console.log(value2);
-    $("#subCategory").append(`<option value="${value2.v}" >${value2.name}</option>`)
-    // console.log(selectedPc);
-    })
-  }
-})
+    // 當選到類別
+    if (selectedPc) {
+      $.each(selectedPc.subCategory, function(index, value2) {
+        // console.log(value2);
+        $("#subCategory").append(`<option value="${value2.v}" >${value2.name}</option>`)
+        // console.log(selectedPc);
+      })
+    }
+  })
 
 
-// 按下送出按鈕要執行以下
+  // 按下送出按鈕要執行以下
   function sendData(e) {
     e.preventDefault();
 
     // 外觀要回復原來的狀態
     fields.forEach(field => {
       field.style.border = '1px solid #CCCCCC';
-      if (field.nextElementSibling){
+      if (field.nextElementSibling) {
         field.nextElementSibling.innerHTML = '';
       }
     })
@@ -186,7 +212,7 @@ $.each(product_category, function(index, value){
     }
 
     // 6.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
-    
+
 
     // 7.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
     if (!inventory.value || inventory.value < 0) {
@@ -194,26 +220,26 @@ $.each(product_category, function(index, value){
       inventory.style.border = '2px solid red';
       inventory.nextElementSibling.innerHTML = '請填寫庫存';
     }
-    
+
     // 沒有通過就不要發送資料
     if (!isPass) {
       return;
     }
-    
+
     // 建立只有資料的表單 用formData類型去接
     const fd = new FormData(document.form1);
 
     // 只要有資料傳送時或是想暫存資料就可以用 AJAX 方式去叫小弟做事 fetch 這支 add-api.php
-    fetch ('add-product-api.php', {
-      method: 'POST',
-      body: fd, // 送出資料格式會自動是mutipart/form-data
-    }).then(r => r.json())
-    .then(data => {
-      console.log({
-        data
-      });
-    })
-    .catch(ex => console.log(ex))
+    fetch('add-product-api.php', {
+        method: 'POST',
+        body: fd, // 送出資料格式會自動是mutipart/form-data
+      }).then(r => r.json())
+      .then(data => {
+        console.log({
+          data
+        });
+      })
+      .catch(ex => console.log(ex))
   }
 
 
