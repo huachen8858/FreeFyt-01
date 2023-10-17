@@ -48,7 +48,7 @@ $title = '新增商品';
             <!-- 庫存數量 -->
             <div class="mb-3">
               <label for="inventory" class="form-label">庫存數量</label>
-              <input type="number" class="form-control" id="inventory" mobile="inventory">
+              <input type="number" class="form-control" id="inventory" name="inventory">
               <div class="form-text"></div>
             </div>
             <!-- 是否上架 -->
@@ -59,26 +59,16 @@ $title = '新增商品';
               <input type="radio" id="on" name="launch" value="0">
               <label for="launch">下架</label>
             </div>
-            <!-- 主要商品圖片:假的上傳按鈕 -->
+            <!-- 主要商品圖片 -->
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
-              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
-              <div class="form-text"></div>
-              <div class="showMainImg" style="width: 300px">
-                <?php if (isset($_POST['$mainImg'])): ?>
-                  <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
-                <?php endif; ?>
-                  <img id="mainImg" name="mainImg" width="100%" class="display: none"/>
+              <input type="file" class="form-control" name="mainImg" accept="image/jpeg,image/png,image/webp" onchange="previewImg(event)">
+              <div style="width:100px" class="showMainImg">
+                <img id="myimg" src="" alt="" width="100%"/>
               </div>
-            </div>
-            <!-- 更多商品圖片 -->
-            <div class="mb-3">
-              <label for="moreImg" class="form-label">更多商品圖片(非必填)</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
-              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.moreImgForm.moreImg.click()">點擊上傳更多圖片</div>
               <div class="form-text"></div>
             </div>
+
         </div>
         <!-- 新增商品／取消新增商品 按鈕 -->
         <div class="d-flex justify-content-center mb-3">
@@ -87,13 +77,13 @@ $title = '新增商品';
         </div>
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
-        <form name="mainImgForm" hidden>
+        <!-- <form name="mainImgForm" hidden>
           <input type="file" name="mainImg" onchange="uploadMainImg(event)">
-        </form>
+        </form> -->
         <!-- 多張圖片上傳的表單(hidden)  -->
-        <form name="moreImgForm" hidden>
+        <!-- <form name="moreImgForm" hidden>
           <input type="file" name="moreImg" onchange="uploadMoreImg()" multiple/>
-        </form>
+        </form> -->
       </div>
     </div>
   </div>
@@ -107,7 +97,6 @@ $title = '新增商品';
   const price_in = document.form1.price;
   const category = document.form1.catogory;
   const mainImg = document.form1.mainImg;
-  const mainImg_hidden = document.mainImgForm.mainImg;
   const moreImg = document.form1.moreImg;
   const inventory = document.form1.inventory;
   const launch = document.form1.launch.value;
@@ -172,26 +161,33 @@ $title = '新增商品';
     }
   })
 
-// ---- 上傳一張圖片
-if (mainImg_hidden.value !== 0) {
-  function uploadMainImg(event) {
-        const fd = new FormData(document.mainImgForm);
+  // 預覽圖片 createObjectURL
+  const previewImg = (event) => {
+        const el = event.currentTarget;
+        myimg.src = URL.createObjectURL(el.files[0]);
+        // console.log(el.files); // 會拿到FileList
+      };
 
-        // 如果其他欄位有值就上傳圖片
-        fetch("upload-img-api-1.php", {
-          method: "POST",
-          body: fd, // enctype="multipart/form-data"
-        })
-          .then((r) => r.json())
-          .then((data) => {
-            // 如果data(output)有值就預覽
-            if (data.success) {
-              mainImg.src = "/Only5/product-imgs/" + data.file;
-            }
-          });
-      }
-}
-  
+  // ---- 上傳一張圖片 傳到api: 
+  // if (mainImg_hidden.value !== 0) {
+  //   function uploadMainImg(event) {
+  //     const fd = new FormData(document.mainImgForm);
+
+  //     // 如果其他欄位有值就上傳圖片
+  //     fetch("upload-img-api-1.php", {
+  //         method: "POST",
+  //         body: fd, // enctype="multipart/form-data"
+  //       })
+  //       .then((r) => r.json())
+  //       .then((data) => {
+  //         // 如果data(output)有值就預覽
+  //         if (data.success) {
+  //           mainImg.src = "/Only5/product-imgs/" + data.file;
+  //         }
+  //       });
+  //   }
+  // }
+
 
   // ---- 按下送出按鈕要執行以下
   function sendData(e) {
@@ -238,18 +234,19 @@ if (mainImg_hidden.value !== 0) {
       inventory.style.border = '2px solid red';
       inventory.nextElementSibling.innerHTML = '請填寫庫存';
     }
-    
+
     // 6.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
 
     // 7.mainImg 如果圖片沒有值 代表資料有誤
     if (!mainImg.value) {
       isPass = false;
+      mainImg.style.border = '2px solid red';
       mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
     }
 
     // 8.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
 
-    
+
 
     // 沒有通過就不要發送資料
     if (!isPass) {
