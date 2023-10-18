@@ -41,14 +41,15 @@ $title = '新增商品';
               <select name="category" id="category" class="form-control">
                 <option value="0">-- 請選擇類別 --</option>
               </select>
+              <div class="form-text"></div>
               <select name="subCategory" id="subCategory" class="form-control">
               </select>
-              <div class="form-text"></div>
+              
             </div>
             <!-- 商品描述 -->
             <div class="mb-3">
               <label for="descriptions" class="form-label">商品描述</label>
-              <textarea class="form-control" name="descriptions" id="descriptions" cols="30" rows="5"></textarea>
+              <textarea class="form-control" name="descriptions" id="descriptions" cols="30" rows="3"></textarea>
               <div class="form-text"></div>
             </div>
             <!-- 庫存數量 -->
@@ -100,7 +101,9 @@ $title = '新增商品';
   // 先拿到欄位參照，因為一開始是空的 沒有值
   const name_in = document.form1.name;
   const price_in = document.form1.price;
-  const category = document.form1.catogory;
+  const category = document.form1.category;
+  const selectedCategory = document.form1.category.value;
+  const descriptions = document.form1.descriptions;
   const mainImg = document.form1.mainImg;
   const moreImg = document.form1.moreImg;
   const inventory = document.form1.inventory;
@@ -108,7 +111,8 @@ $title = '新增商品';
   const fields = [name_in, price_in, inventory];
   const showMainImg = document.querySelector('.showMainImg');
 
-
+console.log(category);
+console.log(selectedCategory);
 
   // 預覽圖片 createObjectURL
   const previewImg = (event) => {
@@ -121,7 +125,7 @@ $title = '新增商品';
     }
   };
 
-  // 宣告商品類別
+  // 宣告商品類別 //改到資料庫一張類別表 categories
   let product_category = [{
       "category": "物品",
       "subCategory": [{
@@ -181,27 +185,6 @@ $title = '新增商品';
 
 
 
-  // ---- 上傳一張圖片 傳到api: 
-  // if (mainImg_hidden.value !== 0) {
-  //   function uploadMainImg(event) {
-  //     const fd = new FormData(document.mainImgForm);
-
-  //     // 如果其他欄位有值就上傳圖片
-  //     fetch("upload-img-api-1.php", {
-  //         method: "POST",
-  //         body: fd, // enctype="multipart/form-data"
-  //       })
-  //       .then((r) => r.json())
-  //       .then((data) => {
-  //         // 如果data(output)有值就預覽
-  //         if (data.success) {
-  //           mainImg.src = "/Only5/product-imgs/" + data.file;
-  //         }
-  //       });
-  //   }
-  // }
-
-
   // ---- 按下送出按鈕要執行以下
   function sendData(e) {
     e.preventDefault();
@@ -218,7 +201,7 @@ $title = '新增商品';
     let isPass = true;
 
     // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
-
+    
 
     // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
@@ -235,29 +218,36 @@ $title = '新增商品';
     }
 
     // 4.category 如果value沒有值，就代表沒選 (尚未釐清)
-    // if (!category) {
-    //   isPass = false;
-    //   category.style.border = '2px solid red';
-    //   category.nextElementSibling.innerHTML = '請選擇商品類別';
-    // }
+    if (selectedCategory === '0') {
+      isPass = false;
+      category.style.border = '2px solid red';
+      category.nextElementSibling.innerHTML = '請選擇商品類別';
+    }
 
-    // 5.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
+    // 5.判斷商品描述 需大於50字
+    if (descriptions.value.length < 50) {
+      $isPass = false;
+      descriptions.style.border = '2px solid red';
+      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
+    }
+
+    // 6.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
     if (!inventory.value || inventory.value < 0) {
       isPass = false;
       inventory.style.border = '2px solid red';
       inventory.nextElementSibling.innerHTML = '請填寫庫存';
     }
 
-    // 6.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
+    // 7.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
 
-    // 7.mainImg 如果圖片沒有值 代表資料有誤
+    // 8.mainImg 如果圖片沒有值 代表資料有誤
     if (!mainImg.value) {
       isPass = false;
       mainImg.style.border = '2px solid red';
       mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
     }
 
-    // 8.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
+    // 9.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
 
 
 
