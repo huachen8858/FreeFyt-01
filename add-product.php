@@ -23,11 +23,11 @@ $rows = $pdo->query($sql)->fetchAll();
           <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
           <hr>
           <form name="form1" onsubmit="sendData(event)">
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
               <input type="text" class="form-control" id="product_id" name="product_id"  placeholder="Pxxxx (待確認新增商品後會自動生成)">
               <div class="form-text"></div>
-            </div>
+            </div> -->
             <div class="mb-3">
               <label for="name" class="form-label">商品名稱</label>
               <input type="text" class="form-control" id="name" name="name">

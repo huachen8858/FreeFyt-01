@@ -19,7 +19,7 @@ header('Content-Type: application/json');
 // 資料寫入前要檢查: 除更多圖片其他欄位必填
 if (empty($_POST['name']) or empty($_POST['price']) or empty($_POST['cate1']) or empty($_POST['cate2']) or empty($_POST['descriptions']) or empty($_POST['inventory']) or empty($_POST['launch'])) {
   $output['errors']['form'] = '缺少欄位資料';
-  echo json_encode($output);
+  echo json_encode($output, JSON_UNESCAPED_UNICODE);
   exit;
 };
 
@@ -57,11 +57,36 @@ $newNumber = $maxNumber + 1;
 // 保持固定五位數 不夠補0
 $numberFormatted = sprintf('%05d', $newNumber); // 例如：00001
 
-// 生成商品編號
-if (!empty($_POST['name'])) {
-  $pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
-}
+function getMaxProductNumber($pdo, $currentDate) {
+  // 编写SQL查询语句，查找与当前日期匹配的记录中的最大序号
+  $sql = "SELECT MAX(SUBSTRING_INDEX(product_id, '-', -1)) AS max_number 
+          FROM product 
+          WHERE product_id LIKE :date_prefix";
 
+  $stmt = $pdo->prepare($sql);
+
+  $datePrefix = 'FYT-' . $currentDate . '-%';
+  $stmt->bindParam(':date_prefix', $datePrefix, PDO::PARAM_STR);
+  $stmt->execute();
+
+  $maxNumberResult = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  // 提取最大序号
+  $maxNumber = (int)$maxNumberResult['max_number'];
+
+  return $maxNumber;
+  }
+
+
+
+// 生成商品編號
+// if (!empty($_POST['name'])) {
+  $pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
+// }
+
+
+
+echo json_encode($pid, JSON_UNESCAPED_UNICODE);
 
 # 與資料庫串接
 // 新增功能： ?用來佔位
