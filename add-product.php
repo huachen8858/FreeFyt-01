@@ -23,11 +23,11 @@ $rows = $pdo->query($sql)->fetchAll();
           <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
           <hr>
           <form name="form1" onsubmit="sendData(event)">
-            <!-- <div class="mb-3">
+            <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
-              <input type="text" class="form-control" id="product_id" name="product_id"  placeholder="Pxxxx (待確認新增商品後會自動生成)">
+              <span class="form-control bg-secondary text-light" id="product_id" name="product_id">FYT-yyyymmdd-xxxx(新增商品後會自動生成)</span>
               <div class="form-text"></div>
-            </div> -->
+            </div>
             <div class="mb-3">
               <label for="name" class="form-label">商品名稱</label>
               <input type="text" class="form-control" id="name" name="name">
@@ -76,6 +76,9 @@ $rows = $pdo->query($sql)->fetchAll();
               <label for="launch">下架</label>
             </div>
             <!-- 主要商品圖片 -->
+            <div class="mb-3">
+            <div style="cursor: pointer;" onclick="document.mainImgForm.mainImg.click()">點選上傳圖片</div>
+            </div>
             <!-- <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
               <input type="file" class="form-control" name="mainImg" accept="image/jpeg,image/png,image/webp" onchange="previewImg(event)">
@@ -92,9 +95,9 @@ $rows = $pdo->query($sql)->fetchAll();
         </div>
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
-        <!-- <form name="mainImgForm" hidden>
+        <form name="mainImgForm" hidden>
           <input type="file" name="mainImg" onchange="uploadMainImg(event)">
-        </form> -->
+        </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
         <!-- <form name="moreImgForm" hidden>
           <input type="file" name="moreImg" onchange="uploadMoreImg()" multiple/>
