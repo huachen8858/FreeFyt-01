@@ -12,7 +12,7 @@ $output =[
 header('Content-Type: application/json');
 
 // 資料寫入前要檢查: 除更多圖片其他欄位必填
-if (empty($_POST['name']) or empty($_POST['price']) or empty($_POST['category']) or empty($_POST['subCategory']) or empty($_POST['mainImg']) or empty($_POST['inventory']) or empty($_POST['launch'])) {
+if (empty($_POST['name']) or empty($_POST['price']) or empty($_POST['category']) or empty($_POST['subCategory']) or empty($_POST['descriptions'])  or empty($_POST['mainImg']) or empty($_POST['inventory']) or empty($_POST['launch'])) {
   $output['errors']['form'] = '缺少欄位資料';
   echo json_encode($output);
   exit;
@@ -23,8 +23,9 @@ $name = $_POST['name'];
 $price = $_POST['price'];
 $category = $_POST['category'];
 $subCcategory = $_POST['subCategory'];
+$descriptions = $_POST['descriptions'];
 $mainImg = $_POST['mainImg'];
-$moreImg = $_POST['moreImg'] ?? '';
+$moreImg = $_POST['moreImg'] ?? NULL;
 $inventory = $_POST['inventory'];
 $launch = $_POST['launch'];
 
@@ -42,12 +43,53 @@ if(! $isPass) {
   exit;
 }
 
+# --- 自動給商品編號 日期＋有序編號 FYT-20231018-00001
+$currentDate = date('Ymd'); 
+
+// 查找資料庫最大的序號
+$maxNumber = getMaxProductNumber($pdo, $currentDate);
+
+$newNumber = $maxNumber + 1;
+
+// 保持固定五位數 不夠補0
+$numberFormatted = sprintf('%05d', $newNumber); // 例如：00001
+
+// 生成商品編號
+if (!empty($_POST['name'])) {
+  $pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
+}
+
+function getMaxProductNumber($pdo, $currentDate) {
+  // 编写SQL查询语句，查找与当前日期匹配的记录中的最大序号
+  $sql = "SELECT MAX(SUBSTRING_INDEX(product_id, '-', -1)) AS max_number 
+          FROM product 
+          WHERE product_id LIKE :date_prefix";
+
+  $stmt = $pdo->prepare($sql);
+
+  $datePrefix = 'FYT-' . $currentDate . '-%';
+  $stmt->bindParam(':date_prefix', $datePrefix, PDO::PARAM_STR);
+  $stmt->execute();
+
+  $maxNumberResult = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  // 提取最大序号
+  $maxNumber = (int)$maxNumberResult['max_number'];
+
+  return $maxNumber;
+  }
+
+
+
+
 # 與資料庫串接
 // 新增功能： ?用來佔位
 $sql = "INSERT INTO `product`(
-  `product_id`, `name`, `price`, `descriptions`,`category`, `subCategory`, `inventory`, `launch`, `created_date`
+    -- `product_id`, 
+    `name`, `category`, `subCategory`, `price`, `descriptions`, `inventory`, `purchase_qty`, `create_date`, `launch`
   ) VALUES (
-    $pid, ?, ?, ?, ?, ?, NOW()
+    -- ?, 
+    ?, ?, ?, ?, ?, ?, '0', NOW(),?
   )";
 
 // pdo 先準備：並沒有真的執行，會先拿到pdo statement 的物件
@@ -55,29 +97,36 @@ $stmt = $pdo->prepare($sql);
 
 // pdo stmt 執行：把表單拿到的值丟到上方的 ?
 $stmt->execute([
+  // $pid,
   $name,
-  $price,
   $category,
   $subCategory,
+  $price,
+  $descriptions,
   $inventory,
   $launch 
 ]);
 
+// 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
+$output['success'] = boolval($stmt->rowCount());
+echo json_encode($output); 
+
+
 $latest_sid = $pdo->lastInsertId(); //取得 PK
 
 
-# 處理圖片
+# -------- 處理圖片
 $dir = __DIR__ . '/product-imgs/';
 
 # 檔案類型的篩選
 $exts = [
   'image/jpeg' => '.jpg',
   'image/png' => '.png',
-  'image/webp' => '.webp',
+  'image/webp' => '.webp'
 ];
 
 $output_img = [
-  'success' => false,
+  'img-success' => false,
   'file' => ''
 ];
 
@@ -97,24 +146,23 @@ if (!empty($_FILES) and !empty($_FILES['mainImg']) and $_FILES['mainImg']['error
         $dir . $f . $ext
       )
     ) {
-      $output_img['success'] = true;
+      $output_img['img-success'] = true;
       $output_img['file'] = $f . $ext; //圖片名稱
     }
   }
 }
 
-$sql2 = "INSERT INTO `product_detail`(`sid`, `product_id`, `img`) VALUES ('?','?')";
+$sql2 = "INSERT INTO `product_detail`(`sid`, `product_id`, `img`) VALUES ( ?, ?, ?)";
 
 $stmt2 = $pdo->prepare($sql2);
 
 $stmt2->execute([
   $latest_sid,
-  $dir . $f . $ext,
+  $pid,
+  $dir . $f . $ext
 ]);
 
 
-// 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
-$output['success'] = boolval($stmt->rowCount());
-$output_img['success'] = boolval($stmt2->rowCount());
-echo json_encode($output); 
+
+$output_img['img-success'] = boolval($stmt2->rowCount());
 echo json_encode($output_img); 

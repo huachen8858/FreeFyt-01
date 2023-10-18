@@ -83,7 +83,7 @@ if ($totalRows > 0) {
                         <td><?= $r['inventory'] ?></td>
                         <td><?= $r['purchase_qty'] ?></td>
                         <td><?= $r['create_date'] ?></td>
-                        <?php if(!$r['sale']) : ?>
+                        <?php if(!$r['launch']) : ?>
                         <td><div class="btn btn-secondary rounded-pill">未上架</div></td>
                         <?php else : ?>
                         <td><div class="btn btn-success rounded-pill">上架中</div></td>

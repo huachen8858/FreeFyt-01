@@ -108,7 +108,7 @@ $title = '新增商品';
   const moreImg = document.form1.moreImg;
   const inventory = document.form1.inventory;
   const launch = document.form1.launch.value;
-  const fields = [name_in, price_in, inventory];
+  const fields = [name_in, price_in, inventory, descriptions, category, mainImg];
   const showMainImg = document.querySelector('.showMainImg');
 
 console.log(category);
@@ -201,7 +201,7 @@ console.log(selectedCategory);
     let isPass = true;
 
     // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
-    
+
 
     // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
@@ -217,15 +217,15 @@ console.log(selectedCategory);
       price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
     }
 
-    // 4.category 如果value沒有值，就代表沒選 (尚未釐清)
-    if (selectedCategory === '0') {
-      isPass = false;
-      category.style.border = '2px solid red';
-      category.nextElementSibling.innerHTML = '請選擇商品類別';
-    }
+    // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有
+    // if (selectedCategory === '0') {
+    //   isPass = false;
+    //   category.style.border = '2px solid red';
+    //   category.nextElementSibling.innerHTML = '請選擇商品類別';
+    // }
 
     // 5.判斷商品描述 需大於50字
-    if (descriptions.value.length < 50) {
+    if (descriptions.value.length < 10) {
       $isPass = false;
       descriptions.style.border = '2px solid red';
       descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
@@ -270,6 +270,10 @@ console.log(selectedCategory);
         });
       })
       .catch(ex => console.log(ex))
+      if (data.success) {
+        alert('資料新增成功');
+        location.href = "product_list.php";
+      }
   }
 
 
