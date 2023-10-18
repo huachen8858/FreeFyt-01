@@ -1,8 +1,5 @@
-<?php 
+<?php
 require './index-parts/connect_db.php';
-
-// 2023 10 18 5:00 這版api 無法成功上傳資料，且有抓到填寫的data 但 success 顯示false
-
 
 // 宣告變數 避免使用者點開此 api 會出現 warning，通常不要直接看api檔案
 $output = [
@@ -41,26 +38,22 @@ if (intval($inventory) === 0) {
 }
 
 // 如果沒有通過檢查
-if(! $isPass) {
+if (!$isPass) {
   echo json_encode($output);
   exit;
 }
 
 # --- 自動給商品編號 日期＋有序編號 FYT-20231018-00001
-$currentDate = date('Ymd'); 
+$currentDate = date('Ymd');
 
 // 查找資料庫最大的序號
 $maxNumber = getMaxProductNumber($pdo, $currentDate);
 
-$newNumber = $maxNumber + 1;
-
-// 保持固定五位數 不夠補0
-$numberFormatted = sprintf('%05d', $newNumber); // 例如：00001
-
-function getMaxProductNumber($pdo, $currentDate) {
-  // 编写SQL查询语句，查找与当前日期匹配的记录中的最大序号
+function getMaxProductNumber($pdo, $currentDate)
+{
+  // 查當前日期匹配的最大序號
   $sql = "SELECT MAX(SUBSTRING_INDEX(product_id, '-', -1)) AS max_number 
-          FROM product 
+          FROM product_list
           WHERE product_id LIKE :date_prefix";
 
   $stmt = $pdo->prepare($sql);
@@ -71,19 +64,19 @@ function getMaxProductNumber($pdo, $currentDate) {
 
   $maxNumberResult = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  // 提取最大序号
+  // 提取最大序號碼
   $maxNumber = (int)$maxNumberResult['max_number'];
 
   return $maxNumber;
-  }
+}
 
+$newNumber = $maxNumber + 1;
 
+// 保持固定五位數 不夠補0
+$numberFormatted = sprintf('%04d', $newNumber); // 例如：0001
 
 // 生成商品編號
-// if (!empty($_POST['name'])) {
-  $pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
-// }
-
+$pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
 
 
 echo json_encode($pid, JSON_UNESCAPED_UNICODE);
@@ -114,7 +107,7 @@ $stmt->execute([
 
 // 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
 $output['success'] = boolval($stmt->rowCount());
-echo json_encode($output); 
+echo json_encode($output);
 
 
 $latest_sid = $pdo->lastInsertId(); //取得 PK
