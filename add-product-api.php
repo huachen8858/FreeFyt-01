@@ -1,6 +1,9 @@
 <?php
 require './index-parts/connect_db.php';
 
+// 告訴用戶端格式為JSON
+header('Content-Type: application/json');
+
 // 宣告變數 避免使用者點開此 api 會出現 warning，通常不要直接看api檔案
 $output = [
   'postData' => $_POST,
@@ -10,12 +13,10 @@ $output = [
 // echo json_encode($output);
 // exit;
 
-// 告訴用戶端格式為JSON
-header('Content-Type: application/json');
 
 // 資料寫入前要檢查: 除更多圖片其他欄位必填
 if (empty($_POST['name']) or empty($_POST['price']) or empty($_POST['cate1']) or empty($_POST['cate2']) or empty($_POST['descriptions']) or empty($_POST['inventory']) or empty($_POST['launch'])) {
-  $output['errors']['form'] = '缺少欄位資料';
+  $output['errors']['form'] = "缺少欄位資料";
   echo json_encode($output, JSON_UNESCAPED_UNICODE);
   exit;
 };
@@ -39,7 +40,7 @@ if (intval($inventory) === 0) {
 
 // 如果沒有通過檢查
 if (!$isPass) {
-  echo json_encode($output);
+  echo json_encode($output, JSON_UNESCAPED_UNICODE);
   exit;
 }
 
@@ -79,7 +80,7 @@ $numberFormatted = sprintf('%04d', $newNumber); // 例如：0001
 $pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
 
 
-echo json_encode($pid, JSON_UNESCAPED_UNICODE);
+// echo json_encode($pid, JSON_UNESCAPED_UNICODE);
 
 # 與資料庫串接
 // 新增功能： ?用來佔位
@@ -107,7 +108,7 @@ $stmt->execute([
 
 // 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
 $output['success'] = boolval($stmt->rowCount());
-echo json_encode($output);
+echo json_encode($output, JSON_UNESCAPED_UNICODE);
 
 
 $latest_sid = $pdo->lastInsertId(); //取得 PK

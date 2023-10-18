@@ -42,11 +42,11 @@ $rows = $pdo->query($sql)->fetchAll();
             <div class="input-group mb-3">
               <span class="input-group-text">主分類</span>
               <select class="form-select" name="cate1" id="cate1" onchange="generateCate2List()">
-                <?php foreach($rows as $r): 
-                  if($r['parent_sid'] == 0) :?>
-                <option value="<?= $r['sid'] ?>"><?= $r['name'] ?></option>
+                <?php foreach ($rows as $r) :
+                  if ($r['parent_sid'] == 0) : ?>
+                    <option value="<?= $r['sid'] ?>"><?= $r['name'] ?></option>
                 <?php endif;
-              endforeach; ?>
+                endforeach; ?>
               </select>
             </div>
             <div class="input-group mb-3">
@@ -122,7 +122,10 @@ $rows = $pdo->query($sql)->fetchAll();
 
 
   // 下拉選單的設定
-  const initVals = {cate1: 1, cate2: 5};
+  const initVals = {
+    cate1: 1,
+    cate2: 5
+  };
   const cates = <?= json_encode($rows, JSON_UNESCAPED_UNICODE) ?>;
   const cate1 = document.querySelector('#cate1');
   const cate2 = document.querySelector('#cate2');
@@ -239,13 +242,14 @@ $rows = $pdo->query($sql)->fetchAll();
       .then(data => {
         console.log({
           data
-        });
+        })
+        console.log(data.success);
+        if (data.success) {
+          alert('資料新增成功');
+          location.href = "product_list.php";
+        }
       })
       .catch(ex => console.log(ex))
-      // if (data.success) {
-      //   alert('資料新增成功');
-      //   location.href = "product_list.php";
-      // }
   }
 
 
@@ -253,7 +257,7 @@ $rows = $pdo->query($sql)->fetchAll();
   function cancelSend() {
     if (confirm(`確定要取消新增資料嗎？`)) {
       document.form1.reset();
-      location.href = 'product_list.php';
+      location.href = "product_list.php";
     }
   }
 </script>
