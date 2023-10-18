@@ -80,8 +80,6 @@ $numberFormatted = sprintf('%04d', $newNumber); // 例如：0001
 $pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
 
 
-// echo json_encode($pid, JSON_UNESCAPED_UNICODE);
-
 # 與資料庫串接
 // 新增功能： ?用來佔位
 $sql = "INSERT INTO `product_list`(
