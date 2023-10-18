@@ -75,10 +75,10 @@ if ($totalRows > 0) {
                     <tr>
                         <td><?= $r['sid'] ?></td>
                         <td><?= $r['product_id'] ?></td>
-                        <td><?= $r['name'] ?></td>
+                        <td><?= htmlentities($r['name']) ?></td>
                         <td><?= $r['price'] ?></td>
                         <!-- 隱藏多於文字text-truncate??? -->
-                        <td class=""><?= $r['descriptions'] ?></td>
+                        <td class=""><?= htmlentities($r['descriptions']) ?></td>
                         
                         <td><?= $r['inventory'] ?></td>
                         <td><?= $r['purchase_qty'] ?></td>

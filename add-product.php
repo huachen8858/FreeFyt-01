@@ -45,6 +45,12 @@ $title = '新增商品';
               </select>
               <div class="form-text"></div>
             </div>
+            <!-- 商品描述 -->
+            <div class="mb-3">
+              <label for="descriptions" class="form-label">商品描述</label>
+              <textarea class="form-control" name="descriptions" id="descriptions" cols="30" rows="5"></textarea>
+              <div class="form-text"></div>
+            </div>
             <!-- 庫存數量 -->
             <div class="mb-3">
               <label for="inventory" class="form-label">庫存數量</label>
@@ -63,17 +69,16 @@ $title = '新增商品';
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
               <input type="file" class="form-control" name="mainImg" accept="image/jpeg,image/png,image/webp" onchange="previewImg(event)">
-              <div style="width:100px" class="showMainImg">
-                <img id="myimg" src="" alt="" width="100%"/>
-              </div>
               <div class="form-text"></div>
+              <div style="width:100px" class="showMainImg">
+                <img id="myimg" src="" alt="" width="100%" />
+              </div>
             </div>
-
-        </div>
-        <!-- 新增商品／取消新增商品 按鈕 -->
-        <div class="d-flex justify-content-center mb-3">
-          <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
-          <button type="button" onclick="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
+            <!-- 新增商品／取消新增商品 按鈕 -->
+            <div class="d-flex justify-content-center mb-3">
+              <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
+              <button type="button" onclick="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
+            </div>
         </div>
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
@@ -106,15 +111,15 @@ $title = '新增商品';
 
 
   // 預覽圖片 createObjectURL
-  let previewImg = (event) => {
-    let myimg = document.querySelector('#myimg');
-        const el = event.target;
-        myimg.src = URL.createObjectURL(el.files[0]);
-        // console.log(el.files); // 會拿到FileList
-        myimg.onload = function () {
-          URL.revokeObjectURL(myimg.src);
-        } 
-      };
+  const previewImg = (event) => {
+    const myimg = document.querySelector('#myimg');
+    const el = event.target;
+    myimg.src = URL.createObjectURL(el.files[0]);
+    // console.log(el.files); // 會拿到FileList
+    myimg.onload = function() {
+      URL.revokeObjectURL(myimg.src); // 無法將原圖片移除
+    }
+  };
 
   // 宣告商品類別
   let product_category = [{

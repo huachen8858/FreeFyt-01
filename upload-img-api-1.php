@@ -1,10 +1,9 @@
 <?php
 require './index-parts/connect_db.php';
 
-// 如果有送出POST就執行下方將圖片存起來
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// 如果有送出POST就執行下方將圖片存起來:好像不能成功
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $dir = __DIR__ . '/product-imgs/';
-
 
   # 檔案類型的篩選
   $exts = [
@@ -42,4 +41,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   echo json_encode($output);
-}
+// }
