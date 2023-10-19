@@ -30,7 +30,7 @@ if ($totalRows > 0) {
     };
 
     $sql = sprintf(
-        "SELECT * FROM product ORDER BY sid DESC LIMIT %s, %s",
+        "SELECT * FROM product_list ORDER BY sid DESC LIMIT %s, %s",
         ($page - 1) * $perPage, 
         $perPage 
     );
