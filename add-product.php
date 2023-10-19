@@ -81,13 +81,15 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
               <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px)</p>
-              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
+              <!-- <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div> -->
+              <input type="file" name="mainImg">
               <div class="form-text"></div>
-              <div class="showMainImg" style="width: 100px">
+              <!-- 假按鈕搭配的preview欄位 -->
+              <!-- <div class="showMainImg" style="width: 100px"> -->
                   <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
                   <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
-                  <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
-              </div>
+                  <!-- <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
+              </div> -->
             </div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
@@ -97,9 +99,9 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         </div>
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
-        <form name="mainImgForm" hidden>
+        <!-- <form name="mainImgForm" hidden>
           <input type="file" name="mainImg" onchange="uploadMainImg(event); previewImg(event)">
-        </form>
+        </form> -->
         <!-- 多張圖片上傳的表單(hidden)  -->
         <!-- <form name="moreImgForm" hidden>
           <input type="file" name="moreImg" onchange="uploadMoreImg()" multiple/>
@@ -253,26 +255,26 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       .catch(ex => console.log(ex))
   }
 
-  // 上傳商品主要圖片
-  function uploadMainImg(event) {
-    event.preventDefault();
+  // 上傳商品主要圖片(呼叫另一支 但是無法同時存到兩張表 得到pk)
+  // function uploadMainImg(event) {
+  //   event.preventDefault();
 
-    // 加上圖片相關判斷
+  //   // 加上圖片相關判斷
 
-    const fd_mainImg = new FormData(document.mainImgForm);
+  //   const fd_mainImg = new FormData(document.mainImgForm);
 
-    fetch("upload-img-api-1.php", {
-        method: 'POST',
-        body: fd_mainImg, // 送出資料格式會自動是mutipart/form-data
-      }).then(r => r.json())
-      .then(data => {
-        console.log({
-          data
-        })
-        console.log(data.success);
-      })
-      .catch(ex_img => console.log(ex_img))
-  }
+  //   fetch("upload-img-api-1.php", {
+  //       method: 'POST',
+  //       body: fd_mainImg, // 送出資料格式會自動是mutipart/form-data
+  //     }).then(r => r.json())
+  //     .then(data => {
+  //       console.log({
+  //         data
+  //       })
+  //       console.log(data.success);
+  //     })
+  //     .catch(ex_img => console.log(ex_img))
+  // }
 
 
   //---- 取消新增
