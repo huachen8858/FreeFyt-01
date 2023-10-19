@@ -3,8 +3,9 @@ require './index-parts/connect_db.php';
 $pageName = 'add';
 $title = '新增商品';
 
-$sql = "SELECT * FROM product_categories";
-$rows = $pdo->query($sql)->fetchAll();
+$sql_category = "SELECT * FROM product_categories";
+$rows_category = $pdo->query($sql_category)->fetchAll();
+
 
 ?>
 <style>
@@ -23,6 +24,8 @@ $rows = $pdo->query($sql)->fetchAll();
           <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
           <hr>
           <form name="form1" onsubmit="sendData(event)">
+          <!-- 獲得最新的sid -->
+          <input type="hidden" name="sid" value="<?= $row['sid']?>">
             <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
               <span class="form-control bg-secondary text-light" id="product_id" name="product_id">FYT-yyyymmdd-xxxx(新增商品後會自動生成)</span>
@@ -42,7 +45,7 @@ $rows = $pdo->query($sql)->fetchAll();
             <div class="input-group mb-3">
               <span class="input-group-text">主分類</span>
               <select class="form-select" name="cate1" id="cate1" onchange="generateCate2List()">
-                <?php foreach ($rows as $r) :
+                <?php foreach ($rows_category as $r) :
                   if ($r['parent_sid'] == 0) : ?>
                     <option value="<?= $r['sid'] ?>"><?= $r['name'] ?></option>
                 <?php endif;
@@ -77,16 +80,16 @@ $rows = $pdo->query($sql)->fetchAll();
             </div>
             <!-- 主要商品圖片 -->
             <div class="mb-3">
-            <div style="cursor: pointer;" onclick="document.mainImgForm.mainImg.click()">點選上傳圖片</div>
-            </div>
-            <!-- <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
-              <input type="file" class="form-control" name="mainImg" accept="image/jpeg,image/png,image/webp" onchange="previewImg(event)">
+              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
+              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
-              <div style="width:100px" class="showMainImg">
-                <img id="myimg" src="" alt="" width="100%" />
+              <div class="showMainImg" style="width: 100px">
+                  <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
+                  <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
+                  <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
               </div>
-            </div> -->
+            </div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
               <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
@@ -96,7 +99,7 @@ $rows = $pdo->query($sql)->fetchAll();
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
         <form name="mainImgForm" hidden>
-          <input type="file" name="mainImg" onchange="uploadMainImg(event)">
+          <input type="file" name="mainImg" onchange="uploadMainImg(event); previewImg(event)">
         </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
         <!-- <form name="moreImgForm" hidden>
@@ -116,7 +119,7 @@ $rows = $pdo->query($sql)->fetchAll();
   const category = document.form1.category;
   // const selectedCategory = document.form1.category.value;
   const descriptions = document.form1.descriptions;
-  // const mainImg = document.form1.mainImg;
+  const mainImg = document.form1.mainImg;
   // const moreImg = document.form1.moreImg;
   const inventory = document.form1.inventory;
   const launch = document.form1.launch.value;
@@ -129,7 +132,7 @@ $rows = $pdo->query($sql)->fetchAll();
     cate1: 1,
     cate2: 5
   };
-  const cates = <?= json_encode($rows, JSON_UNESCAPED_UNICODE) ?>;
+  const cates = <?= json_encode($rows_category, JSON_UNESCAPED_UNICODE) ?>;
   const cate1 = document.querySelector('#cate1');
   const cate2 = document.querySelector('#cate2');
 
@@ -152,20 +155,16 @@ $rows = $pdo->query($sql)->fetchAll();
 
   // 預覽圖片 createObjectURL
   const previewImg = (event) => {
-    const myimg = document.querySelector('#myimg');
     const el = event.target;
-    myimg.src = URL.createObjectURL(el.files[0]);
+    mainImg.src = URL.createObjectURL(el.files[0]);
     // console.log(el.files); // 會拿到FileList
-    myimg.onload = function() {
-      URL.revokeObjectURL(myimg.src); // 無法將原圖片移除
-    }
   };
 
 
 
   // ---- 按下送出按鈕要執行以下
-  function sendData(e) {
-    e.preventDefault();
+  function sendData(event) {
+    event.preventDefault();
 
     // 外觀要回復原來的狀態
     // fields.forEach(field => {
@@ -195,7 +194,7 @@ $rows = $pdo->query($sql)->fetchAll();
     //   price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
     // }
 
-    // // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有
+    // // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有 名稱要改
     // // if (selectedCategory === '0') {
     // //   isPass = false;
     // //   category.style.border = '2px solid red';
@@ -248,11 +247,32 @@ $rows = $pdo->query($sql)->fetchAll();
         })
         console.log(data.success);
         if (data.success) {
-          alert('資料新增成功');
-          location.href = "product_list.php";
+          // alert('商品資料新增成功');
+          // location.href = "product_list.php";
         }
       })
       .catch(ex => console.log(ex))
+  }
+
+  // 上傳商品主要圖片
+  function uploadMainImg(event) {
+    event.preventDefault();
+
+    // 加上圖片相關判斷
+
+    const fd_mainImg = new FormData(document.mainImgForm);
+
+    fetch("upload-img-api-1.php", {
+        method: 'POST',
+        body: fd_mainImg, // 送出資料格式會自動是mutipart/form-data
+      }).then(r => r.json())
+      .then(data => {
+        console.log({
+          data
+        })
+        console.log(data.success);
+      })
+      .catch(ex_img => console.log(ex_img))
   }
 
 

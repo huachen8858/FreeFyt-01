@@ -109,4 +109,4 @@ $output['success'] = boolval($stmt->rowCount());
 echo json_encode($output, JSON_UNESCAPED_UNICODE);
 
 
-$latest_sid = $pdo->lastInsertId(); //取得 PK
+// $latest_sid = $pdo->lastInsertId(); //取得 PK
