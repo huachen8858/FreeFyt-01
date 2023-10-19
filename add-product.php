@@ -24,11 +24,10 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
           <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
           <hr>
           <form name="form1" onsubmit="sendData(event)">
-          <!-- 獲得最新的sid : issue 得不到 因為送出是同步的 要想別的選單-->
-          <input type="hidden" name="sid" value="<?= $row['sid']?>">
+          <!-- 獲得最新的sid : issue 得不到sid 因為送出是同步的 要想別的選單 value=""-->
             <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
-              <span class="form-control bg-secondary text-light" id="product_id" name="product_id">FYT-yyyymmdd-xxxx(新增商品後會自動生成)</span>
+              <span class="form-control bg-secondary text-light" id="product_id" >FYT-yyyymmdd-xxxx(新增商品後會自動生成)</span>
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
@@ -75,13 +74,13 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
               <label for="launch" class="form-label">上架狀態</label>&nbsp;
               <input type="radio" id="on" name="launch" value="1" checked>
               <label for="launch">上架</label>&nbsp;
-              <input type="radio" id="on" name="launch" value="0">
+              <input type="radio" id="off" name="launch" value="0">
               <label for="launch">下架</label>
             </div>
             <!-- 主要商品圖片 -->
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
+              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px)</p>
               <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
               <div class="showMainImg" style="width: 100px">
