@@ -54,16 +54,18 @@ $title = '編輯商品';
               <input type="number" class="form-control" id="price" name="price" value="<?= htmlentities($row['price']) ?>">
               <div class="form-text"></div>
             </div>
-            <!-- 商品分類 下拉式選單 -->
+            <!-- 商品分類 下拉式選單 ： 尚未帶入值 用三元一次-->
             <div class="input-group mb-3">
               <span class="input-group-text">主分類</span>
               <select class="form-select" name="cate1" id="cate1" onchange="generateCate2List()">
+              <!-- 如果 -->
                 <?php foreach ($rows_category as $r) :
                   if ($r['parent_sid'] == 0) : ?>
                     <option value="<?= $r['sid'] ?>"><?= $r['name'] ?></option>
                 <?php endif;
                 endforeach; ?>
               </select>
+
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">次分類</span>
@@ -92,9 +94,9 @@ $title = '編輯商品';
             <div class="mb-3">
               <label for="launch" class="form-label">上架狀態</label>&nbsp;
               <!-- if判斷如果是1 就顯示上架 else顯示下架 -->
-              <input type="radio" id="on" name="launch" value="1" <?php if($row['launch'] === 1) echo 'checked'; ?>>
+              <input type="radio" id="on" name="launch" value="1" <?php if ($row['launch'] === 1) echo 'checked'; ?>>
               <label for="launch">上架</label>&nbsp;
-              <input type="radio" id="off" name="launch" value="0" <?php if($row['launch'] === 0) echo 'checked'; ?>>
+              <input type="radio" id="off" name="launch" value="0" <?php if ($row['launch'] === 0) echo 'checked'; ?>>
               <label for="launch">下架</label>
             </div>
             <!-- 主要商品圖片 -->
@@ -111,7 +113,7 @@ $title = '編輯商品';
             </div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
-              <button type="submit" class="btn btn-warning rounded-pill">編輯商品</button> &nbsp;
+              <button type="submit" class="btn btn-warning rounded-pill">確認修改商品</button> &nbsp;
               <button type="button" onclick="cancelSend(event)" class="btn btn-secondary rounded-pill">取消編輯</button>
             </div>
         </div>
@@ -256,7 +258,7 @@ $title = '編輯商品';
     const fd = new FormData(document.form1);
 
     // 只要有資料傳送時或是想暫存資料就可以用 AJAX 方式去叫小弟做事 fetch 這支 add-api.php
-    fetch("add-product-api.php", {
+    fetch("edit-product-api.php", {
         method: 'POST',
         body: fd, // 送出資料格式會自動是mutipart/form-data
       }).then(r => r.json())
@@ -264,9 +266,8 @@ $title = '編輯商品';
         console.log({
           data
         })
-        console.log(data.success);
         if (data.success) {
-          // alert('商品資料新增成功');
+          // alert('商品資料修改成功');
           // location.href = "product_list.php";
         }
       })
@@ -297,7 +298,7 @@ $title = '編輯商品';
 
   //---- 取消新增
   function cancelSend() {
-    if (confirm(`確定要取消新增資料嗎？`)) {
+    if (confirm(`確定要取消編輯資料嗎？`)) {
       document.form1.reset();
       location.href = "product_list.php";
     }
