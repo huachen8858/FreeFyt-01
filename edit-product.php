@@ -1,11 +1,21 @@
 <?php
 require './index-parts/connect_db.php';
-$pageName = 'add';
-$title = '新增商品';
 
-$sql_category = "SELECT * FROM product_categories";
-$rows_category = $pdo->query($sql_category)->fetchAll();
 
+// 取得資料的PK 設定給sid
+$sid = isset($_GET['sid']) ? intval($_GET['sid']): 0;
+
+if (empty($sid)) {
+  header("Location: product_list.php");
+  exit;
+}
+
+$sql = "SELECT * FROM product_list WHERE sid={$sid}"; 
+$row = $pdo->query($sql)->fetch();
+
+
+$pageName = 'edit';
+$title = '編輯商品';
 
 ?>
 <style>
@@ -21,14 +31,14 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     <div class="col">
       <div class="card">
         <div class="card-body">
-          <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
+          <h3 class="card-title text-gray-800 text-center">編輯商品資料</h3>
           <hr>
           <form name="form1" onsubmit="sendData(event)">
-          <!-- 獲得最新的sid : issue 得不到 因為送出是同步的 要想別的選單-->
+          <!-- 獲得最新的sid -->
           <input type="hidden" name="sid" value="<?= $row['sid']?>">
             <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
-              <span class="form-control bg-secondary text-light" id="product_id" name="product_id">FYT-yyyymmdd-xxxx(新增商品後會自動生成)</span>
+              <input type="text" class="form-control bg-secondary text-light" id="product_id" name="product_id" value="<?= $row['product_id'] ?>">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
