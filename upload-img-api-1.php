@@ -43,7 +43,7 @@ if (!empty($_FILES) and !empty($_FILES['mainImg']) and $_FILES['mainImg']['error
 }
 
 $latest_sid = $pdo->lastInsertId(); //取得 PK
-$imgurl = $dir . $f . $ext;
+$imgurl = $f . $ext; // 只存檔名就好
 
 $sql = "INSERT INTO `product_detail`(`product_sid`, `img`) VALUES (?, ?)";
 
