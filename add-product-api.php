@@ -34,9 +34,9 @@ $launch = $_POST['launch'] ?? '';
 $isPass = true;
 
 //如果庫存量為0,launch設定為0
-if (intval($inventory) === 0) {
-  $launch = 0;
-}
+// if (intval($inventory) === 0) {
+//   $launch = 0;
+// }
 
 // 如果沒有通過檢查
 if (!$isPass) {
