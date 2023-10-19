@@ -3,16 +3,19 @@ require './index-parts/connect_db.php';
 
 
 // 取得資料的PK 設定給sid
-$sid = isset($_GET['sid']) ? intval($_GET['sid']): 0;
+$sid = isset($_GET['sid']) ? intval($_GET['sid']) : 0;
 
 if (empty($sid)) {
   header("Location: product_list.php");
   exit;
 }
 
-$sql = "SELECT * FROM product_list WHERE sid={$sid}"; 
+$sql = "SELECT * FROM product_list WHERE sid = {$sid}";
 $row = $pdo->query($sql)->fetch();
+// echo json_encode($row);
 
+$sql_category = "SELECT * FROM product_categories";
+$rows_category = $pdo->query($sql_category)->fetchAll();
 
 $pageName = 'edit';
 $title = '編輯商品';
@@ -34,21 +37,21 @@ $title = '編輯商品';
           <h3 class="card-title text-gray-800 text-center">編輯商品資料</h3>
           <hr>
           <form name="form1" onsubmit="sendData(event)">
-          <!-- 獲得最新的sid -->
-          <input type="hidden" name="sid" value="<?= $row['sid']?>">
+            <!-- 獲得最新的sid -->
+            <input type="hidden" name="sid" value="<?php echo $sid ?>">
             <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
-              <input type="text" class="form-control bg-secondary text-light" id="product_id" name="product_id" value="<?= $row['product_id'] ?>">
+              <input type="text" class="form-control bg-secondary text-light" id="product_id" name="product_id" value="<?php echo isset($row["product_id"]) ? htmlentities($row["product_id"]) : ''; ?>" disabled>
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
               <label for="name" class="form-label">商品名稱</label>
-              <input type="text" class="form-control" id="name" name="name">
+              <input type="text" class="form-control" id="name" name="name" value="<?= htmlentities($row['name']) ?>">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
               <label for="price" class="form-label">商品價格</label>
-              <input type="number" class="form-control" id="price" name="price">
+              <input type="number" class="form-control" id="price" name="price" value="<?= htmlentities($row['price']) ?>">
               <div class="form-text"></div>
             </div>
             <!-- 商品分類 下拉式選單 -->
@@ -65,45 +68,51 @@ $title = '編輯商品';
             <div class="input-group mb-3">
               <span class="input-group-text">次分類</span>
               <select class="form-select" name="cate2" id="cate2">
+                <?php foreach ($rows_category as $r) :
+                  if ($r['parent_sid'] == $row['category']) : ?>
+                    <option value="<?= $row['parent_sid'] ?>"><?= $r['name'] ?></option>
+                <?php endif;
+                endforeach; ?>
               </select>
             </div>
 
             <!-- 商品描述 -->
             <div class="mb-3">
               <label for="descriptions" class="form-label">商品描述</label>
-              <textarea class="form-control" name="descriptions" id="descriptions" cols="30" rows="3"></textarea>
+              <textarea class="form-control" name="descriptions" id="descriptions" cols="30" rows="3"><?= htmlentities($row['descriptions']) ?></textarea>
               <div class="form-text"></div>
             </div>
             <!-- 庫存數量 -->
             <div class="mb-3">
               <label for="inventory" class="form-label">庫存數量</label>
-              <input type="number" class="form-control" id="inventory" name="inventory">
+              <input type="number" class="form-control" id="inventory" name="inventory" value="<?= htmlentities($row['inventory']) ?>">
               <div class="form-text"></div>
             </div>
             <!-- 是否上架 -->
             <div class="mb-3">
               <label for="launch" class="form-label">上架狀態</label>&nbsp;
-              <input type="radio" id="on" name="launch" value="1" checked>
+              <!-- if判斷如果是1 就顯示上架 else顯示下架 -->
+              <input type="radio" id="on" name="launch" value="1" <?php if($row['launch'] === 1) echo 'checked'; ?>>
               <label for="launch">上架</label>&nbsp;
-              <input type="radio" id="on" name="launch" value="0">
+              <input type="radio" id="off" name="launch" value="0" <?php if($row['launch'] === 0) echo 'checked'; ?>>
               <label for="launch">下架</label>
             </div>
             <!-- 主要商品圖片 -->
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px, 檔案大小 500K 以內)</p>
+              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px)</p>
               <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
               <div class="showMainImg" style="width: 100px">
-                  <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
-                  <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
-                  <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
+                <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
+                <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
+                <img src="" alt="" id="mainImg" name="mainImg" width="100%" />
               </div>
             </div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
-              <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
-              <button type="button" onclick="cancelSend(event)" class="btn btn-secondary rounded-pill">取消新增</button>
+              <button type="submit" class="btn btn-warning rounded-pill">編輯商品</button> &nbsp;
+              <button type="button" onclick="cancelSend(event)" class="btn btn-secondary rounded-pill">取消編輯</button>
             </div>
         </div>
         </form>
