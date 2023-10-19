@@ -89,7 +89,7 @@ if ($totalRows > 0) {
                         <td><div class="btn btn-success rounded-pill">上架中</div></td>
                         <?php endif; ?>
                         <td><a href="javascript: deleteItem(<?= $r['sid'] ?>)"><i class="far fa-trash-alt"></a></td>
-                        <td><a href="edit-product.php"><i class="far fa-edit"></a></td>
+                        <td><a href="edit-product.php?sid=<?= $r['sid'] ?>"><i class="far fa-edit"></a></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
