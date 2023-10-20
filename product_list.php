@@ -44,10 +44,21 @@ if ($totalRows > 0) {
 
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">商品管理</h1>
-
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h5 class="m-0 font-weight-bold text-primary">總商品列表</h5>
+            <!-- Search -->
+            <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" id="search-form" name="search-form">
+                <div class="input-group">
+                    <input type="text" id="search-field" name="search-field" class="form-control bg-light border-1 small " placeholder="搜尋商品名稱" aria-label="Search" aria-describedby="basic-addon2" />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!-- add-product -->
             <div class="btn btn-primary rounded-pill">
                 <a class="text-light" href="add-product.php"><i class="fas fa-plus"></i> 新增商品</a>
             </div>
@@ -70,7 +81,7 @@ if ($totalRows > 0) {
                             <th><i class="far fa-edit"></i></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="original-table">
                         <?php foreach ($rows as $r) : ?>
                             <tr>
                                 <td><?= $r['sid'] ?></td>
@@ -138,5 +149,46 @@ if ($totalRows > 0) {
             location.href = 'delete-product.php?sid=' + sid;
         }
     }
+
+    // Search
+    const originalTable = document.querySelector("#original-table")
+    const searchForm = document.querySelector("#search-form");
+
+    searchForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const searchStr = document.querySelector("#search-field").value;
+        const fd = new FormData(searchForm);
+
+        fetch('product-search-api.php', {
+                method: 'POST',
+                body: fd,
+            })
+            .then(r => r.json())
+            .then(data => {
+                originalTable.innerHTML = ``; //將原本的列表清空 顯示出要的資料
+
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                <td>${item.sid}</td>
+                <td>${item.product_id}</td>
+                <td>${item.name}</td>
+                <td>${item.price}</td>
+                <td>${item.descriptions}</td>
+                <td>${item.inventory}</td>
+                <td>${item.purchase_qty}</td>
+                <td>${item.create_date}</td>
+                <td>${item.launch}</td>
+                <td><a href="javascript: deleteItem(${item.sid})"><i class="far fa-trash-alt"></a></td>
+                <td><a href="edit-product.php?sid=${item.sid}"><i class="far fa-edit"></a></td>
+                `;
+                        originalTable.appendChild(row);
+                    });
+                } else {
+                    resultTable.innerHTML = '<tr><td colspan="13">No results found.</td></tr>';
+                }
+            })
+    })
 </script>
 <?php include './index-parts/html-foot.php' ?>

@@ -179,9 +179,6 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
 
-    // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
-
-
     // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
       $isPass = false;
@@ -249,7 +246,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         if (data.success) {
           alert('商品資料新增成功');
           sendData2(); // 呼叫先去做圖片上傳
-          // location.href = "product_list.php";
+          location.href = "product_list.php";
         }
       })
       .catch(ex => console.log(ex))
