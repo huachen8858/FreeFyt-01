@@ -6,7 +6,7 @@ $sid = isset($_GET['sid']) ? intval($_GET['sid']) : 0;
 
 // 判斷有沒有拿到值 // 如果有值就執行以下程式刪除欄位資料，如果沒有值就不執行以下程式(刪除)會直接跳下方程式碼倒回原頁面
 if (! empty($sid)) {
-  $sql = "DELETE FROM product WHERE sid={$sid}";
+  $sql = "DELETE FROM product_list WHERE sid={$sid}";
   $pdo->query($sql);
 }
 
