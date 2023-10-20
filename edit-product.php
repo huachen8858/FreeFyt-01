@@ -54,15 +54,16 @@ $title = '編輯商品';
               <input type="number" class="form-control" id="price" name="price" value="<?= htmlentities($row['price']) ?>">
               <div class="form-text"></div>
             </div>
-            <!-- 商品分類 下拉式選單 ： 尚未帶入值 用三元一次-->
+            <!-- 商品分類 下拉式選單 -->
             <div class="input-group mb-3">
               <span class="input-group-text">主分類</span>
               <select class="form-select" name="cate1" id="cate1" onchange="generateCate2List()">
-              <!-- 如果 -->
                 <?php foreach ($rows_category as $r) :
-                  if ($r['parent_sid'] == 0) : ?>
-                    <option value="<?= $r['sid'] ?>"><?= $r['name'] ?></option>
-                <?php endif;
+                  if ($r['parent_sid'] == 0) : 
+                ?>
+                  <option value="<?= $r['sid'] ?>" <?php echo ($r['sid'] == $row['main_category']) ? 'selected' :''?> ><?= $r['name'] ?></option>
+                <?php
+                endif;
                 endforeach; ?>
               </select>
 
@@ -71,9 +72,11 @@ $title = '編輯商品';
               <span class="input-group-text">次分類</span>
               <select class="form-select" name="cate2" id="cate2">
                 <?php foreach ($rows_category as $r) :
-                  if ($r['parent_sid'] == $row['category']) : ?>
-                    <option value="<?= $row['parent_sid'] ?>"><?= $r['name'] ?></option>
-                <?php endif;
+                  if ($r['parent_sid'] == $row['category']) : 
+                ?>
+                  <option value="<?= $row['parent_sid'] ?>"><?= $r['name'] ?></option>
+                  <?php
+                endif;
                 endforeach; ?>
               </select>
             </div>
@@ -106,9 +109,7 @@ $title = '編輯商品';
               <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
               <div class="showMainImg" style="width: 100px">
-                <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
-                <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
-                <img src="" alt="" id="mainImg" name="mainImg" width="100%" />
+                <img src="./product-imgs/<?= $row['img'] ?>" alt="" id="mainImg" name="mainImg" width="100%" />
               </div>
             </div>
             <!-- 新增商品／取消新增商品 按鈕 -->
@@ -120,7 +121,7 @@ $title = '編輯商品';
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
         <form name="mainImgForm" hidden>
-          <input type="file" name="mainImg" onchange="uploadMainImg(event); previewImg(event)">
+          <input type="file" name="mainImg" onchange="previewImg(event)">
         </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
         <!-- <form name="moreImgForm" hidden>
@@ -149,10 +150,10 @@ $title = '編輯商品';
 
 
   // 下拉選單的設定
-  const initVals = {
-    cate1: 1,
-    cate2: 5
-  };
+  // const initVals = {
+  //   cate1: 1,
+  //   cate2: 5
+  // };
   const cates = <?= json_encode($rows_category, JSON_UNESCAPED_UNICODE) ?>;
   const cate1 = document.querySelector('#cate1');
   const cate2 = document.querySelector('#cate2');
@@ -169,9 +170,9 @@ $title = '編輯商品';
     cate2.innerHTML = str;
   }
 
-  cate1.value = initVals.cate1; // 設定第一層的初始值
+  // cate1.value = initVals.cate1; // 設定第一層的初始值
   generateCate2List(); // 一進來就呼叫 / 生第二層
-  cate2.value = initVals.cate2; // 設定第二層的初始持
+  // cate2.value = initVals.cate2; // 設定第二層的初始值
 
 
   // 預覽圖片 createObjectURL
@@ -198,22 +199,19 @@ $title = '編輯商品';
     // // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
 
-    // // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
-
-
     // // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
-    // if (name_in.value.length < 2) {
-    //   $isPass = false;
-    //   name_in.style.border = '2px solid red';
-    //   name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
-    // }
+    if (name_in.value.length < 2) {
+      $isPass = false;
+      name_in.style.border = '2px solid red';
+      name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
+    }
 
     // //3.price 如果價格<1 就不是正確值
-    // if (price_in.value <= 0) {
-    //   isPass = false;
-    //   price_in.style.border = '2px solid red';
-    //   price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
-    // }
+    if (price_in.value <= 0) {
+      isPass = false;
+      price_in.style.border = '2px solid red';
+      price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
+    }
 
     // // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有 名稱要改
     // // if (selectedCategory === '0') {
@@ -223,11 +221,11 @@ $title = '編輯商品';
     // // }
 
     // // 5.判斷商品描述 需大於50字
-    // if (descriptions.value.length < 10) {
-    //   $isPass = false;
-    //   descriptions.style.border = '2px solid red';
-    //   descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
-    // }
+    if (descriptions.value.length < 10) {
+      $isPass = false;
+      descriptions.style.border = '2px solid red';
+      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
+    }
 
     // // 6.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
     // if (!inventory.value || inventory.value < 0) {
@@ -244,8 +242,6 @@ $title = '編輯商品';
     //   mainImg.style.border = '2px solid red';
     //   mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
     // }
-
-    // 9.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
 
 
 
@@ -267,33 +263,32 @@ $title = '編輯商品';
           data
         })
         if (data.success) {
-          // alert('商品資料修改成功');
-          // location.href = "product_list.php";
+          alert('商品資料修改成功');
+          sendData2(); // 呼叫先去做圖片上傳
+          location.href = "product_list.php";
         }
       })
       .catch(ex => console.log(ex))
   }
 
-  // 上傳商品主要圖片
-  function uploadMainImg(event) {
-    event.preventDefault();
 
-    // 加上圖片相關判斷
-
+  // 上傳資料完呼叫這支去上傳圖片 要做到資料和圖片同時上傳
+  function sendData2() {
     const fd_mainImg = new FormData(document.mainImgForm);
-
-    fetch("upload-img-api-1.php", {
+    fetch('upload-img-api-2.php', {
         method: 'POST',
-        body: fd_mainImg, // 送出資料格式會自動是mutipart/form-data
-      }).then(r => r.json())
+        body: fd_mainImg,
+      })
+      .then(r => r.json())
       .then(data => {
         console.log({
           data
         })
-        console.log(data.success);
       })
-      .catch(ex_img => console.log(ex_img))
+      .catch(ex => console.log(ex))
   }
+
+  
 
 
   //---- 取消新增

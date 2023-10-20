@@ -56,6 +56,7 @@ if (!$isPass) {
 $sql = "UPDATE `product_list` SET 
 `name`=?,
 `price`=?,
+`main_category`=?,
 `category`=?,
 `descriptions`=?,
 `inventory`=?,
@@ -68,6 +69,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([
   $name,
   $price,
+  $cate1,
   $cate2,
   $descriptions,
   $inventory,
@@ -75,6 +77,5 @@ $stmt->execute([
   $sid
 ]);
 
-// 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
 $output['success'] = boolval($stmt->rowCount());
 echo json_encode($output, JSON_UNESCAPED_UNICODE);
