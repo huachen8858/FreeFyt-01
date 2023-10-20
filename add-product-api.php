@@ -84,9 +84,9 @@ $pid = 'FYT-' . $currentDate . '-' . $numberFormatted;
 // 新增功能： ?用來佔位
 $sql = "INSERT INTO `product_list`(
     `product_id`, 
-    `name`, `price`, `main_category`, `category`, `descriptions`, `inventory`, `purchase_qty`, `launch`, `create_date`
+    `name`, `price`, `main_category`, `category`, `descriptions`, `inventory`, `purchase_qty`, `launch`, `create_date`, `img`
   ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW()
+    ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW(), ''
   )";
 
 

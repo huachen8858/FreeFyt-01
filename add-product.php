@@ -81,8 +81,9 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片</label>
               <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px)</p>
-              <!-- <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div> -->
-              <input type="file" name="mainImg">
+              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
+
+              <!-- <input type="file" name="mainImg"> -->
               <div class="form-text"></div>
               <!-- 假按鈕搭配的preview欄位 -->
               <!-- <div class="showMainImg" style="width: 100px"> -->
@@ -99,9 +100,9 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         </div>
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
-        <!-- <form name="mainImgForm" hidden>
-          <input type="file" name="mainImg" onchange="uploadMainImg(event); previewImg(event)">
-        </form> -->
+        <form name="mainImgForm" hidden>
+          <input type="file" name="mainImg" onchange="previewImg(event)">
+        </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
         <!-- <form name="moreImgForm" hidden>
           <input type="file" name="moreImg" onchange="uploadMoreImg()" multiple/>
@@ -118,7 +119,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   const name_in = document.form1.name;
   const price_in = document.form1.price;
   const category = document.form1.category;
-  // const selectedCategory = document.form1.category.value;
+  // const selectedCategory = document.form1.category;
   const descriptions = document.form1.descriptions;
   const mainImg = document.form1.mainImg;
   // const moreImg = document.form1.moreImg;
@@ -168,64 +169,62 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     event.preventDefault();
 
     // 外觀要回復原來的狀態
-    // fields.forEach(field => {
-    //   field.style.border = '1px solid #CCCCCC';
-    //   if (field.nextElementSibling) {
-    //     field.nextElementSibling.innerHTML = '';
-    //   }
-    // })
+    fields.forEach(field => {
+      field.style.border = '1px solid #CCCCCC';
+      if (field.nextElementSibling) {
+        field.nextElementSibling.innerHTML = '';
+      }
+    })
 
-    // // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
+    // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
 
-    // // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
+    // 1.商品編號亂數或for給數字？ 在前端做？ 要怎麼知道資料庫已有的值
 
 
-    // // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
-    // if (name_in.value.length < 2) {
-    //   $isPass = false;
-    //   name_in.style.border = '2px solid red';
-    //   name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
-    // }
+    // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
+    if (name_in.value.length < 2) {
+      $isPass = false;
+      name_in.style.border = '2px solid red';
+      name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
+    }
 
-    // //3.price 如果價格<1 就不是正確值
-    // if (price_in.value <= 0) {
+    //3.price 如果價格<1 就不是正確值
+    if (price_in.value <= 0) {
+      isPass = false;
+      price_in.style.border = '2px solid red';
+      price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
+    }
+
+    // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有 名稱要改
+    // if (selectedCategory.value === '0') {
     //   isPass = false;
-    //   price_in.style.border = '2px solid red';
-    //   price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
+    //   category.style.border = '2px solid red';
+    //   category.nextElementSibling.innerHTML = '請選擇商品類別';
     // }
-
-    // // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有 名稱要改
-    // // if (selectedCategory === '0') {
-    // //   isPass = false;
-    // //   category.style.border = '2px solid red';
-    // //   category.nextElementSibling.innerHTML = '請選擇商品類別';
-    // // }
 
     // // 5.判斷商品描述 需大於50字
-    // if (descriptions.value.length < 10) {
-    //   $isPass = false;
-    //   descriptions.style.border = '2px solid red';
-    //   descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
-    // }
+    if (descriptions.value.length < 10) {
+      $isPass = false;
+      descriptions.style.border = '2px solid red';
+      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
+    }
 
     // // 6.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
-    // if (!inventory.value || inventory.value < 0) {
-    //   isPass = false;
-    //   inventory.style.border = '2px solid red';
-    //   inventory.nextElementSibling.innerHTML = '請填寫庫存';
-    // }
+    if (!inventory.value || inventory.value < 0) {
+      isPass = false;
+      inventory.style.border = '2px solid red';
+      inventory.nextElementSibling.innerHTML = '請填寫庫存';
+    }
 
     // 7.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
 
     // 8.mainImg 如果圖片沒有值 代表資料有誤
-    // if (!mainImg.value) {
+    // if (!mainImg) {
     //   isPass = false;
     //   mainImg.style.border = '2px solid red';
     //   mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
     // }
-
-    // 9.moreImg 非必填: 是否要判別跟主圖片一樣就提醒?
 
 
 
@@ -248,9 +247,26 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         })
         console.log(data.success);
         if (data.success) {
-          // alert('商品資料新增成功');
+          alert('商品資料新增成功');
+          sendData2(); // 呼叫先去做圖片上傳
           // location.href = "product_list.php";
         }
+      })
+      .catch(ex => console.log(ex))
+  }
+
+  // 上傳資料完呼叫這支去上傳圖片 要做到資料和圖片同時上傳
+  function sendData2() {
+    const fd_mainImg = new FormData(document.mainImgForm);
+    fetch('upload-img-api-2.php', {
+        method: 'POST',
+        body: fd_mainImg,
+      })
+      .then(r => r.json())
+      .then(data => {
+        console.log({
+          data
+        });
       })
       .catch(ex => console.log(ex))
   }
