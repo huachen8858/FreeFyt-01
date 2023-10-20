@@ -113,58 +113,58 @@ echo json_encode($output, JSON_UNESCAPED_UNICODE);
 // $latest_sid = $pdo->lastInsertId(); //取得 PK
 
 
-# 上傳圖片檔名到 product_detail ------------------------------
-$dir = __DIR__ . '/product-imgs/';
+// # 上傳圖片檔名到 product_detail ------------------------------ 圖片上傳寫到另一支api
+// $dir = __DIR__ . '/product-imgs/';
 
-# 檔案類型的篩選
-$exts = [
-  'image/jpeg' => '.jpg',
-  'image/png' => '.png',
-  'image/webp' => '.webp',
-];
-
-
-$output_img = [
-  'success' => false,
-  'file' => ''
-];
-
-$mainImg = $_POST['mainImg'] ?? '';
-// echo json_encode($output);
-$f = ''; // 初始化 $f 為空字串
-$ext = '';
-
-if (!empty($_FILES) and !empty($_FILES['mainImg']) and $_FILES['mainImg']['error'] == 0) {
-
-  if (!empty($exts[$_FILES['mainImg']['type']])) {
-    $ext = $exts[$_FILES['mainImg']['type']]; // 副檔名
-
-    # 隨機的主檔名
-    $f = sha1($_FILES['mainImg']['name'] . uniqid());
-
-    # 將檔案直接存到資料夾
-    if (
-      move_uploaded_file(
-        $_FILES['mainImg']['tmp_name'],
-        $dir . $f . $ext
-      )
-    ) {
-      $output_img['success'] = true;
-      $output_img['file'] = $f . $ext;
-    }
-    $imgurl = $f . $ext; // 只存檔名就好
-
-    $sql_img = "INSERT INTO `product_detail`(`product_sid`, `img`) VALUES (?, ?)";
+// # 檔案類型的篩選
+// $exts = [
+//   'image/jpeg' => '.jpg',
+//   'image/png' => '.png',
+//   'image/webp' => '.webp',
+// ];
 
 
-    $stmt_img = $pdo->prepare($sql_img);
+// $output_img = [
+//   'success' => false,
+//   'file' => ''
+// ];
 
-    $stmt_img->execute([
-      $pid,
-      $imgurl
-    ]);
-  }
-}
+// $mainImg = $_POST['mainImg'] ?? '';
+// // echo json_encode($output);
+// $f = ''; // 初始化 $f 為空字串
+// $ext = '';
 
-$output_img['success'] = boolval($stmt_img->rowCount());
-echo json_encode($output_img, JSON_UNESCAPED_UNICODE);
+// if (!empty($_FILES) and !empty($_FILES['mainImg']) and $_FILES['mainImg']['error'] == 0) {
+
+//   if (!empty($exts[$_FILES['mainImg']['type']])) {
+//     $ext = $exts[$_FILES['mainImg']['type']]; // 副檔名
+
+//     # 隨機的主檔名
+//     $f = sha1($_FILES['mainImg']['name'] . uniqid());
+
+//     # 將檔案直接存到資料夾
+//     if (
+//       move_uploaded_file(
+//         $_FILES['mainImg']['tmp_name'],
+//         $dir . $f . $ext
+//       )
+//     ) {
+//       $output_img['success'] = true;
+//       $output_img['file'] = $f . $ext;
+//     }
+//     $imgurl = $f . $ext; // 只存檔名就好
+
+//     $sql_img = "INSERT INTO `product_detail`(`product_sid`, `img`) VALUES (?, ?)";
+
+
+//     $stmt_img = $pdo->prepare($sql_img);
+
+//     $stmt_img->execute([
+//       $pid,
+//       $imgurl
+//     ]);
+
+//     $output_img['success'] = boolval($stmt_img->rowCount());
+//     echo json_encode($output_img, JSON_UNESCAPED_UNICODE);
+//   }
+// }
