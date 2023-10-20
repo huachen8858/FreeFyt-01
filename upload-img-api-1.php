@@ -48,15 +48,12 @@ $imgurl = $f . $ext; // 只存檔名就好
 $sql = "INSERT INTO `product_detail`(`product_sid`, `img`) VALUES (?, ?)";
 
 
-// pdo 先準備：並沒有真的執行，會先拿到pdo statement 的物件
 $stmt = $pdo->prepare($sql);
 
-// pdo stmt 執行：把表單拿到的值丟到上方的 ?
 $stmt->execute([
   $latest_sid,
   $imgurl
 ]);
 
-// 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
 $output['success'] = boolval($stmt->rowCount());
 echo json_encode($output, JSON_UNESCAPED_UNICODE);
