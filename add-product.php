@@ -71,16 +71,17 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
             </div>
             <!-- 是否上架 -->
             <div class="mb-3">
-              <label for="launch" class="form-label">上架狀態</label>&nbsp;
-              <input type="radio" id="on" name="launch" value="1" checked>
+              <label for="launch" class="form-label">上架狀態</label><br/>
+              <input type="radio" id="on" name="launch" value="1">
               <label for="launch">上架</label>&nbsp;
               <input type="radio" id="off" name="launch" value="0">
               <label for="launch">下架</label>
+              <span class="form-text" id="launchVerify"></span>
             </div>
             <!-- 主要商品圖片 -->
             <div class="mb-3">
               <label for="mainImg" class="form-label">主要商品圖片(建議圖片大小 600 x 600px)</label>
-              <br/>
+              <br />
               <div class="btn btn-secondary uploadButton" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
               <div class="showMainImg" style="width: 100px">
@@ -124,6 +125,9 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   const showMainImg = document.querySelector('.showMainImg');
   const uploadButton = document.querySelector(".uploadButton");
   const mainImgElement = document.querySelector("#mainImg");
+  const onRadioButton = document.querySelector('#on');
+  const offRadioButton = document.querySelector('#off');
+  const launchVerify = document.querySelector('#launchVerify');
 
 
   // 下拉選單的設定
@@ -173,6 +177,8 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       }
     })
 
+    launchVerify.innerHTML = '';
+
     uploadButton.style.border = '1px solid #CCCCCC';
     uploadButton.nextElementSibling.innerHTML = '';
 
@@ -200,21 +206,30 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     //   category.nextElementSibling.innerHTML = '請選擇商品類別';
     // }
 
-    // // 5.判斷商品描述 需大於50字
+    // 5.判斷商品描述 需大於10字
     if (descriptions.value.length < 10) {
       $isPass = false;
       descriptions.style.border = '2px solid red';
-      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
+      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿10字)';
     }
 
-    // // 6.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
-    if (!inventory.value || inventory.value < 0) {
-      isPass = false;
-      inventory.style.border = '2px solid red';
-      inventory.nextElementSibling.innerHTML = '請填寫庫存';
+    // 6.判斷是否填寫上架狀態
+    if (onRadioButton.checked) {
+      const launchStatus = onRadioButton.value;
+    } else if (offRadioButton.checked) {
+      const launchStatus = offRadioButton.value;
+    } else {
+      $isPass = false;
+      launchVerify.innerHTML = '請選擇是否要上架';
     }
 
-    // 7.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
+    // 7.判斷上架狀態：預設為1,如果inventory填寫0自動將launch設為0
+    const inventoryValue = parseInt(inventory.value, 10); 
+    const launchStatus = onRadioButton.checked ? 1 : 0;
+    if (inventoryValue === 0 && launchStatus === 1){
+      onRadioButton.checked = false;
+      offRadioButton.checked = true;
+    }
 
     // 8.mainImg 檢查圖片是否有上傳
     let imgSrc = mainImgElement.getAttribute("src");
@@ -256,7 +271,6 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         console.log(data.success);
         if (data.success) {
           // alert('商品資料新增成功');
-          let str = '';
           info.innerHTML = `<div class="alert alert-success" role="alert">
           商品資料修改成功
           </div>`
