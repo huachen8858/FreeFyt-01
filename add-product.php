@@ -79,18 +79,13 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
             </div>
             <!-- 主要商品圖片 -->
             <div class="mb-3">
-              <label for="mainImg" class="form-label">主要商品圖片</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px)</p>
-              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
-
-              <!-- <input type="file" name="mainImg"> -->
+              <label for="mainImg" class="form-label">主要商品圖片(建議圖片大小 600 x 600px)</label>
+              <br/>
+              <div class="btn btn-secondary uploadButton" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
-              <!-- 假按鈕搭配的preview欄位 -->
-              <!-- <div class="showMainImg" style="width: 100px"> -->
-              <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
-              <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
-              <!-- <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
-              </div> -->
+              <div class="showMainImg" style="width: 100px">
+                <img src="./img/default_img.jpg" alt="" id="mainImg" name="mainImg" width="100%" />
+              </div>
             </div>
             <div id="info"></div>
             <!-- 新增商品／取消新增商品 按鈕 -->
@@ -123,11 +118,12 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   // const selectedCategory = document.form1.category;
   const descriptions = document.form1.descriptions;
   const mainImg = document.form1.mainImg;
-  // const moreImg = document.form1.moreImg;
   const inventory = document.form1.inventory;
   const launch = document.form1.launch.value;
   const fields = [name_in, price_in, inventory, descriptions];
   const showMainImg = document.querySelector('.showMainImg');
+  const uploadButton = document.querySelector(".uploadButton");
+  const mainImgElement = document.querySelector("#mainImg");
 
 
   // 下拉選單的設定
@@ -165,7 +161,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
 
 
 
-  // ---- 按下送出按鈕要執行以下
+  // ---- 按下送出按鈕要執行以下驗證及AJAX -----
   function sendData(event) {
     event.preventDefault();
 
@@ -176,6 +172,9 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         field.nextElementSibling.innerHTML = '';
       }
     })
+
+    uploadButton.style.border = '1px solid #CCCCCC';
+    uploadButton.nextElementSibling.innerHTML = '';
 
     // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
@@ -217,12 +216,23 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
 
     // 7.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
 
-    // 8.mainImg 如果圖片沒有值 代表資料有誤
-    // if (!mainImg) {
-    //   isPass = false;
-    //   mainImg.style.border = '2px solid red';
-    //   mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
-    // }
+    // 8.mainImg 檢查圖片是否有上傳
+    let imgSrc = mainImgElement.getAttribute("src");
+    if (imgSrc == "./img/default_img.jpg") {
+      isPass = false;
+      uploadButton.style.border = '2px solid red';
+      uploadButton.nextElementSibling.innerHTML = '請上傳商品圖片';
+    }
+
+
+    uploadButton.addEventListener("click", function() {
+      // 判定是否使用預設圖
+      if (imgSrc === "./img/default_img.jpg") {
+        isPass = false;
+        uploadButton.style.border = '2px solid red';
+        uploadButton.nextElementSibling.innerHTML = '請上傳商品圖片';
+      }
+    });
 
 
 
