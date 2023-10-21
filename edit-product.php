@@ -72,9 +72,9 @@ $title = '編輯商品';
               <span class="input-group-text">次分類</span>
               <select class="form-select" name="cate2" id="cate2">
                 <?php foreach ($rows_category as $r) :
-                  if ($r['parent_sid'] == $row['category']) : 
+                  if ($r['parent_sid'] == $row['main_category']) : 
                 ?>
-                  <option value="<?= $row['parent_sid'] ?>"><?= $r['name'] ?></option>
+                  <option value="<?= $row['sid'] ?>" <?php echo ($r['sid'] == $row['category']) ? 'selected':'' ?>><?= $r['name'] ?></option>
                   <?php
                 endif;
                 endforeach; ?>
@@ -171,7 +171,7 @@ $title = '編輯商品';
   }
 
   // cate1.value = initVals.cate1; // 設定第一層的初始值
-  generateCate2List(); // 一進來就呼叫 / 生第二層
+  // generateCate2List(); // 一進來就呼叫 / 生第二層
   // cate2.value = initVals.cate2; // 設定第二層的初始值
 
 
