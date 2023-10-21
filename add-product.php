@@ -199,21 +199,14 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
     }
 
-    // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有 名稱要改
-    // if (selectedCategory.value === '0') {
-    //   isPass = false;
-    //   category.style.border = '2px solid red';
-    //   category.nextElementSibling.innerHTML = '請選擇商品類別';
-    // }
-
-    // 5.判斷商品描述 需大於10字
+    // 4.判斷商品描述 需大於10字
     if (descriptions.value.length < 10) {
       $isPass = false;
       descriptions.style.border = '2px solid red';
       descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿10字)';
     }
 
-    // 6.判斷是否填寫上架狀態
+    // 5.判斷是否填寫上架狀態
     if (onRadioButton.checked) {
       const launchStatus = onRadioButton.value;
     } else if (offRadioButton.checked) {
@@ -223,7 +216,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       launchVerify.innerHTML = '請選擇是否要上架';
     }
 
-    // 7.判斷上架狀態：預設為1,如果inventory填寫0自動將launch設為0
+    // 6.判斷上架狀態：預設為1,如果inventory填寫0自動將launch設為0
     const inventoryValue = parseInt(inventory.value, 10); 
     const launchStatus = onRadioButton.checked ? 1 : 0;
     if (inventoryValue === 0 && launchStatus === 1){
@@ -231,14 +224,13 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       offRadioButton.checked = true;
     }
 
-    // 8.mainImg 檢查圖片是否有上傳
+    // 7.mainImg 檢查圖片是否有上傳
     let imgSrc = mainImgElement.getAttribute("src");
     if (imgSrc == "./img/default_img.jpg") {
       isPass = false;
       uploadButton.style.border = '2px solid red';
       uploadButton.nextElementSibling.innerHTML = '請上傳商品圖片';
     }
-
 
     uploadButton.addEventListener("click", function() {
       // 判定是否使用預設圖
@@ -249,8 +241,6 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       }
     });
 
-
-
     // 沒有通過就不要發送資料
     if (!isPass) {
       return;
@@ -259,7 +249,6 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     // 建立只有資料的表單 用formData類型去接
     const fd = new FormData(document.form1);
 
-    // 只要有資料傳送時或是想暫存資料就可以用 AJAX 方式去叫小弟做事 fetch 這支 add-api.php
     fetch("add-product-api.php", {
         method: 'POST',
         body: fd, // 送出資料格式會自動是mutipart/form-data
@@ -306,7 +295,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       .catch(ex => console.log(ex))
   }
 
-
+  // 等待一秒再跳轉畫面
   function pauseForOneSecond() {
     setTimeout(function() {
       location.href = "product_list.php";
