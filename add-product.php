@@ -24,10 +24,10 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
           <h3 class="card-title text-gray-800 text-center">新增商品資料</h3>
           <hr>
           <form name="form1" onsubmit="sendData(event)">
-          <!-- 獲得最新的sid : issue 得不到sid 因為送出是同步的 要想別的選單 value=""-->
+            <!-- 獲得最新的sid : issue 得不到sid 因為送出是同步的 要想別的選單 value=""-->
             <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
-              <span class="form-control bg-secondary text-light" id="product_id" >FYT-yyyymmdd-xxxx(新增商品後會自動生成)</span>
+              <span class="form-control bg-secondary text-light" id="product_id">FYT-yyyymmdd-xxxx(新增商品後會自動生成)</span>
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
@@ -87,11 +87,12 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
               <div class="form-text"></div>
               <!-- 假按鈕搭配的preview欄位 -->
               <!-- <div class="showMainImg" style="width: 100px"> -->
-                  <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
-                  <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
-                  <!-- <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
+              <!-- <img style="display: none" src="" alt="" id="mainImg" name="mainImg" width="100%"/> -->
+              <!-- !empty($mainImg) ? '' : 'display: none'  判斷有沒有值？-->
+              <!-- <img src="" alt="" id="mainImg" name="mainImg" width="100%"/>
               </div> -->
             </div>
+            <div id="info"></div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
               <button type="submit" class="btn btn-warning rounded-pill">新增商品</button> &nbsp;
@@ -244,9 +245,13 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         })
         console.log(data.success);
         if (data.success) {
-          alert('商品資料新增成功');
+          // alert('商品資料新增成功');
+          let str = '';
+          info.innerHTML = `<div class="alert alert-success" role="alert">
+          商品資料修改成功
+          </div>`
           sendData2(); // 呼叫先去做圖片上傳
-          location.href = "product_list.php";
+          pauseForOneSecond();
         } else {
           for (let n in data.errors) {
             console.log(`n: ${n}`);
@@ -277,27 +282,12 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       .catch(ex => console.log(ex))
   }
 
-  // 上傳商品主要圖片(呼叫另一支 但是無法同時存到兩張表 得到pk)
-  // function uploadMainImg(event) {
-  //   event.preventDefault();
 
-  //   // 加上圖片相關判斷
-
-  //   const fd_mainImg = new FormData(document.mainImgForm);
-
-  //   fetch("upload-img-api-1.php", {
-  //       method: 'POST',
-  //       body: fd_mainImg, // 送出資料格式會自動是mutipart/form-data
-  //     }).then(r => r.json())
-  //     .then(data => {
-  //       console.log({
-  //         data
-  //       })
-  //       console.log(data.success);
-  //     })
-  //     .catch(ex_img => console.log(ex_img))
-  // }
-
+  function pauseForOneSecond() {
+    setTimeout(function() {
+      location.href = "product_list.php";
+    }, 1000);
+  }
 
   //---- 取消新增
   function cancelSend() {
