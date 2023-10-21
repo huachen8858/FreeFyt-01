@@ -247,6 +247,15 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
           alert('商品資料新增成功');
           sendData2(); // 呼叫先去做圖片上傳
           location.href = "product_list.php";
+        } else {
+          for (let n in data.errors) {
+            console.log(`n: ${n}`);
+            if (document.form1[n]) {
+              const input = document.form1[n];
+              input.style.border = '2px solid red';
+              input.nextElementSibling.innerHTML = data.errors[n];
+            }
+          }
         }
       })
       .catch(ex => console.log(ex))
@@ -255,7 +264,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   // 上傳資料完呼叫這支去上傳圖片 要做到資料和圖片同時上傳
   function sendData2() {
     const fd_mainImg = new FormData(document.mainImgForm);
-    fetch('upload-img-api-2.php', {
+    fetch('add-product-img-api.php', {
         method: 'POST',
         body: fd_mainImg,
       })
