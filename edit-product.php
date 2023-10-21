@@ -38,7 +38,7 @@ $title = '編輯商品';
           <hr>
           <form name="form1" onsubmit="sendData(event)">
             <!-- 獲得最新的sid -->
-            <input type="hidden" name="sid" value="<?php echo $sid ?>">
+            <input type="hidden" name="sid" value="<?= $sid ?>">
             <div class="mb-3">
               <label for="product_id" class="form-label">商品編號</label>
               <input type="text" class="form-control bg-secondary text-light" id="product_id" name="product_id" value="<?php echo isset($row["product_id"]) ? htmlentities($row["product_id"]) : ''; ?>" disabled>
@@ -59,11 +59,11 @@ $title = '編輯商品';
               <span class="input-group-text">主分類</span>
               <select class="form-select" name="cate1" id="cate1" onchange="generateCate2List()">
                 <?php foreach ($rows_category as $r) :
-                  if ($r['parent_sid'] == 0) : 
+                  if ($r['parent_sid'] == 0) :
                 ?>
-                  <option value="<?= $r['sid'] ?>" <?php echo ($r['sid'] == $row['main_category']) ? 'selected' :''?> ><?= $r['name'] ?></option>
+                    <option value="<?= $r['sid'] ?>" <?php echo ($r['sid'] == $row['main_category']) ? 'selected' : '' ?>><?= $r['name'] ?></option>
                 <?php
-                endif;
+                  endif;
                 endforeach; ?>
               </select>
 
@@ -72,11 +72,11 @@ $title = '編輯商品';
               <span class="input-group-text">次分類</span>
               <select class="form-select" name="cate2" id="cate2">
                 <?php foreach ($rows_category as $r) :
-                  if ($r['parent_sid'] == $row['main_category']) : 
+                  if ($r['parent_sid'] == $row['main_category']) :
                 ?>
-                  <option value="<?= $row['sid'] ?>" <?php echo ($r['sid'] == $row['category']) ? 'selected':'' ?>><?= $r['name'] ?></option>
-                  <?php
-                endif;
+                    <option value="<?= $r['sid'] ?>" <?php echo ($r['sid'] == $row['category']) ? 'selected' : '' ?>><?= $r['name'] ?></option>
+                <?php
+                  endif;
                 endforeach; ?>
               </select>
             </div>
@@ -112,6 +112,7 @@ $title = '編輯商品';
                 <img src="./product-imgs/<?= $row['img'] ?>" alt="" id="mainImg" name="mainImg" width="100%" />
               </div>
             </div>
+            <div id="info"></div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
               <button type="submit" class="btn btn-warning rounded-pill">確認修改商品</button> &nbsp;
@@ -121,6 +122,7 @@ $title = '編輯商品';
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
         <form name="mainImgForm" hidden>
+          <input type="hidden" name="sid" value="<?= $sid ?>">
           <input type="file" name="mainImg" onchange="previewImg(event)">
         </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
@@ -252,8 +254,9 @@ $title = '編輯商品';
 
     // 建立只有資料的表單 用formData類型去接
     const fd = new FormData(document.form1);
+    const fd_mainImg = new FormData(document.mainImgForm);
 
-    // 只要有資料傳送時或是想暫存資料就可以用 AJAX 方式去叫小弟做事 fetch 這支 add-api.php
+    // 只要有資料傳送時或是想暫存資料就可以用 AJAX 方式去叫小弟做事
     fetch("edit-product-api.php", {
         method: 'POST',
         body: fd, // 送出資料格式會自動是mutipart/form-data
@@ -262,39 +265,51 @@ $title = '編輯商品';
         console.log({
           data
         })
-        if (data.success) {
-          alert('商品資料修改成功');
-          sendData2(); // 呼叫先去做圖片上傳
-          location.href = "product_list.php";
+        // 無論商品資料是否有修改 去上傳圖片＋更新檔名
+        fetch('edit-product-img-api.php', {
+            method: 'POST',
+            body: fd_mainImg,
+          })
+          .then(r => r.json())
+          .then(img_data => {
+            console.log({
+              data
+            })
+          })
+          .catch(ex => console.log(ex))
+        if (data.success || img_data.success) {
+          // alert('商品資料修改成功');
+          let str = '';
+          info.innerHTML = `<div class="alert alert-success" role="alert">
+          商品資料修改成功
+          </div>`;
+          pauseForOneSecond();
+          // location.href = "product_list.php";
+        } else {
+          for (let n in data.errors) {
+            console.log(`n: ${n}`);
+            // location.href = "product_list.php"
+            if (document.form1[n]) {
+              const input = document.form1[n];
+              input.style.border = '2px solid red';
+              input.nextElementSibling.innerHTML = data.errors[n];
+            }
+          }
         }
       })
       .catch(ex => console.log(ex))
   }
 
-
-  // 上傳資料完呼叫這支去上傳圖片 要做到資料和圖片同時上傳
-  function sendData2() {
-    const fd_mainImg = new FormData(document.mainImgForm);
-    fetch('upload-img-api-2.php', {
-        method: 'POST',
-        body: fd_mainImg,
-      })
-      .then(r => r.json())
-      .then(data => {
-        console.log({
-          data
-        })
-      })
-      .catch(ex => console.log(ex))
+  function pauseForOneSecond() {
+    setTimeout(function() {
+      location.href = "product_list.php";
+    }, 1000);
   }
-
-  
-
 
   //---- 取消新增
   function cancelSend() {
     if (confirm(`確定要取消編輯資料嗎？`)) {
-      document.form1.reset();
+      document.form1.reset(); // 回覆預設？？
       location.href = "product_list.php";
     }
   }
