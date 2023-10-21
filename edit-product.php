@@ -104,12 +104,15 @@ $title = '編輯商品';
             </div>
             <!-- 主要商品圖片 -->
             <div class="mb-3">
-              <label for="mainImg" class="form-label">主要商品圖片</label>
-              <p class="form-text text-secondary" style="font-size: 14px">(建議圖片大小 600 x 600px)</p>
-              <div class="btn btn-secondary" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
+              <label for="mainImg" class="form-label">主要商品圖片(建議圖片大小 600 x 600px)</label>
+              <br />
+              <div class="btn btn-secondary uploadButton" style="cursor: pointer" onclick="document.mainImgForm.mainImg.click()">點擊上傳主要圖片</div>
               <div class="form-text"></div>
               <div class="showMainImg" style="width: 100px">
-                <img src="./product-imgs/<?= $row['img'] ?>" alt="" id="mainImg" name="mainImg" width="100%" />
+                <?php
+                $imgUrl = empty($row['img']) ? './img/default_img.jpg' : './product-imgs/' . $row['img'];
+                ?>
+                <img src="<?= $imgUrl ?>" alt="" id="mainImg" name="mainImg" width="100%" />
               </div>
             </div>
             <div id="info"></div>
@@ -149,6 +152,8 @@ $title = '編輯商品';
   const launch = document.form1.launch.value;
   const fields = [name_in, price_in, inventory, descriptions];
   const showMainImg = document.querySelector('.showMainImg');
+  const uploadButton = document.querySelector(".uploadButton");
+  const mainImgElement = document.querySelector("#mainImg");
 
 
   // 下拉選單的設定
@@ -191,12 +196,15 @@ $title = '編輯商品';
     event.preventDefault();
 
     // 外觀要回復原來的狀態
-    // fields.forEach(field => {
-    //   field.style.border = '1px solid #CCCCCC';
-    //   if (field.nextElementSibling) {
-    //     field.nextElementSibling.innerHTML = '';
-    //   }
-    // })
+    fields.forEach(field => {
+      field.style.border = '1px solid #CCCCCC';
+      if (field.nextElementSibling) {
+        field.nextElementSibling.innerHTML = '';
+      }
+    })
+
+    uploadButton.style.border = '1px solid #CCCCCC';
+    uploadButton.nextElementSibling.innerHTML = '';
 
     // // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
@@ -238,12 +246,24 @@ $title = '編輯商品';
 
     // 7.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
 
-    // 8.mainImg 如果圖片沒有值 代表資料有誤
-    // if (!mainImg.value) {
-    //   isPass = false;
-    //   mainImg.style.border = '2px solid red';
-    //   mainImg.nextElementSibling.innerHTML = '請上傳商品圖片';
-    // }
+    // 8.mainImg 圖片驗證
+    let imgSrc = mainImgElement.getAttribute("src");
+    if (imgSrc == "./img/default_img.jpg") {
+      isPass = false;
+      uploadButton.style.border = '2px solid red';
+      uploadButton.nextElementSibling.innerHTML = '請上傳商品圖片';
+    }
+
+
+    uploadButton.addEventListener("click", function() {
+      // 判定是否使用預設圖
+      if (imgSrc === "./img/default_img.jpg") {
+        isPass = false;
+        uploadButton.style.border = '2px solid red';
+        uploadButton.nextElementSibling.innerHTML = '請上傳商品圖片';
+      }
+    });
+
 
 
 
