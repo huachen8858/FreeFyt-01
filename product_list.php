@@ -1,7 +1,7 @@
 <?php
 require './index-parts/connect_db.php';
 $title = '商品管理系統';
-$perPage = 5;
+$perPage = 10;
 
 // 檢查是否有登入管理者身份
 // if (isset($_SESSION['admin'])){
@@ -16,7 +16,7 @@ if ($page < 1) {
 }
 
 # 算筆數
-$t_sql = "SELECT COUNT(1) FROM product";
+$t_sql = "SELECT COUNT(1) FROM product_list";
 
 # 總筆數
 $totalRows = $pdo->query($t_sql)->fetch(PDO::FETCH_NUM)[0];
@@ -70,7 +70,7 @@ if ($totalRows > 0) {
             </div>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
+            <div class="table-responsive scroll" style="max-width: 1800px;">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
@@ -78,7 +78,7 @@ if ($totalRows > 0) {
                             <th>商品編號</th>
                             <th>商品名稱</th>
                             <th>商品價格</th>
-                            <th>商品描述</th>
+                            <th style="max-width: 100px;">商品描述</th>
                             <th>庫存量</th>
                             <th>累積購買數</th>
                             <th>建立日期</th>
@@ -95,7 +95,7 @@ if ($totalRows > 0) {
                                 <td><?= htmlentities($r['name']) ?></td>
                                 <td><?= $r['price'] ?></td>
                                 <!-- 隱藏多於文字text-truncate??? -->
-                                <td class=""><?= htmlentities($r['descriptions']) ?></td>
+                                <td class="text-truncate" style="max-width: 100px;"><?= htmlentities($r['descriptions']) ?></td>
 
                                 <td><?= $r['inventory'] ?></td>
                                 <td><?= $r['purchase_qty'] ?></td>
@@ -117,31 +117,34 @@ if ($totalRows > 0) {
                 </table>
             </div>
         </div>
-        <!-- 總列數/總頁數 -->
-        <div><?= "$totalRows / $totalPages" ?></div>
+        
 
-        <!-- pagination:還沒調整完 -->
-        <div class="raw">
-            <div class="col d-flex justify-content-end">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item <?= $page == 1 ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=1">
-                                <i class="fa-solid fa-angles-left"></i></a>
-                        </li>
-                        <?php for ($i = $page - 3; $i <= $page + 3; $i++) :
-                            if ($i >= 1 and $i <= $totalPages) : ?>
-                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-                                </li>
-                            <?php endif; ?>
-                        <?php endfor; ?>
-                        <li class="page-item <?= $page == $totalPages ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=<?= $totalPages ?>">
-                                <i class="fa-solid fa-angles-right"></i></a>
-                        </li>
-                    </ul>
-                </nav>
+        <!-- pagination -->
+        <div class="container">
+            <div class="raw">
+                <div class="col d-flex justify-content-end">
+                    <!-- 總列數/總頁數 -->
+                    <div class="col"><?= "$totalRows / $totalPages" ?></div>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item <?= $page == 1 ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=1">
+                                    <i class="fa-solid fa-angles-left"></i></a>
+                            </li>
+                            <?php for ($i = $page - 3; $i <= $page + 3; $i++) :
+                                if ($i >= 1 and $i <= $totalPages) : ?>
+                                    <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                    </li>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                            <li class="page-item <?= $page == $totalPages ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=<?= $totalPages ?>">
+                                    <i class="fa-solid fa-angles-right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
     </div>
