@@ -82,7 +82,9 @@ if ($totalRows > 0) {
                             <th>庫存量</th>
                             <th>累積購買數</th>
                             <th>建立日期</th>
-                            <th>是否上架</th>
+                            <th>是否上架&nbsp;&nbsp;
+                                <button id="filter-toggle" class="btn btn-outline-secondary btn-sm"><i class="fas fa-sort-down"></i></button>
+                            </th>
                             <th><i class="far fa-trash-alt"></i></th>
                             <th><i class="far fa-edit"></i></th>
                         </tr>
@@ -94,19 +96,18 @@ if ($totalRows > 0) {
                                 <td><?= $r['product_id'] ?></td>
                                 <td><?= htmlentities($r['name']) ?></td>
                                 <td><?= $r['price'] ?></td>
-                                <!-- 隱藏多於文字text-truncate??? -->
+                                <!-- 隱藏多於文字text-truncate 要記得給寬度 -->
                                 <td class="text-truncate" style="max-width: 100px;"><?= htmlentities($r['descriptions']) ?></td>
-
                                 <td><?= $r['inventory'] ?></td>
                                 <td><?= $r['purchase_qty'] ?></td>
                                 <td><?= $r['create_date'] ?></td>
                                 <?php if (!$r['launch']) : ?>
                                     <td>
-                                        <div class="btn btn-secondary rounded-pill">未上架</div>
+                                        <div class="btn btn-secondary rounded-pill status">未上架</div>
                                     </td>
                                 <?php else : ?>
                                     <td>
-                                        <div class="btn btn-success rounded-pill">上架中</div>
+                                        <div class="btn btn-success rounded-pill status">上架中</div>
                                     </td>
                                 <?php endif; ?>
                                 <td><a href="javascript: deleteItem(<?= $r['sid'] ?>)"><i class="far fa-trash-alt"></a></td>
@@ -117,7 +118,7 @@ if ($totalRows > 0) {
                 </table>
             </div>
         </div>
-        
+
 
         <!-- pagination -->
         <div class="container">
@@ -199,5 +200,40 @@ if ($totalRows > 0) {
                 }
             })
     })
+
+    // launch filter
+    const launchFilter = document.querySelector('#filter-toggle');
+    let filterState = 'all';
+
+    launchFilter.addEventListener("click", function() {
+    const rows = document.querySelectorAll('#dataTable tbody tr');
+
+    if (filterState === 'all') {
+        rows.forEach(row => {
+            const statusElement = row.querySelector(".status");
+            if (statusElement.textContent === "上架中") {
+                row.style.display = "table-row";
+            } else {
+                row.style.display = "none";
+            }
+        });
+        filterState = 'launched';
+    } else if (filterState === "launched") {
+        rows.forEach(row => {
+            const statusElement = row.querySelector(".status");
+            if (statusElement.textContent === "未上架") {
+                row.style.display = "table-row";
+            } else {
+                row.style.display = "none";
+            }
+        });
+        filterState = 'not-launched';
+    } else {
+        rows.forEach(row => {
+            row.style.display = "table-row";
+        });
+        filterState = 'all';
+    }
+});
 </script>
 <?php include './index-parts/html-foot.php' ?>
