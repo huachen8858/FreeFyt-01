@@ -15,6 +15,9 @@ if ($page < 1) {
     exit; # 結束這支php
 }
 
+// 篩選價格的初始值
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'original';
+
 # 算筆數
 $t_sql = "SELECT COUNT(1) FROM product_list";
 
@@ -35,12 +38,30 @@ if ($totalRows > 0) {
         exit;
     };
 
-    $sql = sprintf(
-        "SELECT * FROM product_list ORDER BY sid DESC LIMIT %s, %s",
-        ($page - 1) * $perPage,
-        $perPage
-    );
-    $rows = $pdo->query($sql)->fetchAll();
+    // 篩選價格
+    $sql = '';
+    if ($sort === 'original') {
+        $sql = sprintf(
+            "SELECT * FROM product_list ORDER BY sid DESC LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } elseif ($sort === 'desc') {
+        $sql = sprintf(
+            "SELECT * FROM product_list ORDER BY price DESC, sid DESC LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } elseif ($sort === 'asc') {
+        $sql = sprintf(
+            "SELECT * FROM product_list ORDER BY price ASC, sid DESC LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    }
+    if (!empty($sql)) {
+        $rows = $pdo->query($sql)->fetchAll();
+    }
 }
 
 ?>
@@ -70,7 +91,7 @@ if ($totalRows > 0) {
             </div>
         </div>
         <!-- Filter -->
-        <div class="mx-4 my-3">
+        <!-- <div class="mx-4 my-3">
             <form id="filter-form" class="d-flex flex-row align-items-center">
                 <label for="filterCategory" class="mb-0">選擇篩選分類：</label>
                 <select id="filterCategory" name="filterCategory" class="form-control form-control-sm " style="width:150px;">
@@ -79,12 +100,24 @@ if ($totalRows > 0) {
                     <option value="1">價格</option>
                 </select>
                 &nbsp;
-                <button type="button" id="filterButton" class="btn btn-warning btn-sm rounded-pill">篩選</button>
+                <button type="button" class="btn btn-warning btn-sm rounded-pill">篩選</button>
             </form>
+        </div> -->
+        <!-- Filter -->
+        <div class="mx-4 my-2">
+            <a class="btn btn-sm btn-secondary" href="product_list.php">所有資料</a>
         </div>
+
+        <div class="mx-4 my-2">
+            <div for="filterCategory" class="mb-0 d-inline">價格篩選：</div>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=asc">由低到高</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=desc">由高到低</a>
+        </div>
+
+
         <!-- 結果顯示 -->
-        <div class="card-body">
-            <div class="table-responsive scroll" style="max-width: 1800px;">
+        <div class="card-body scroll">
+            <div class="table-responsive " style="max-width: 1800px;">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
@@ -251,97 +284,7 @@ if ($totalRows > 0) {
     });
 
 
-    // 篩選 sid 升冪排列及頁碼問題
-    let currentPage = <?= $page ?>;
-
-    const filterForm = document.querySelector("#filter-form");
-    const filterButton = document.querySelector("#filterButton")
-
-    function loadTable(data) {
-        originalTable.innerHTML = "";
-
-        data.forEach(item => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-            <td>${item.sid}</td>
-            <td>${item.product_id}</td>
-            <td>${item.name}</td>
-            <td>${item.price}</td>
-            <td class="text-truncate" style="max-width: 100px;">${item.descriptions}</td>
-            <td>${item.inventory}</td>
-            <td>${item.purchase_qty}</td>
-            <td>${item.create_date}</td>
-            <td>${item.launch}</td>
-            <td><a href="javascript: deleteItem(${item.sid})"><i class="far fa-trash-alt"></a></td>
-            <td><a href="edit-product.php?sid=${item.sid}"><i class="far fa-edit"></a></td>
-        `;
-            originalTable.appendChild(row);
-        });
-
-        // 在这里添加代码以重新应用分页
-    }
-
-    function applyPagination() {
-        const originalTable = document.querySelector("#original-table");
-        const rows = originalTable.querySelectorAll("tr");
-
-        const itemsPerPage = 10; // 每页显示的数据数量
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-
-        rows.forEach((row, index) => {
-            if (index >= startIndex && index < endIndex) {
-                row.style.display = "table-row"; // 显示当前页的数据
-            } else {
-                row.style.display = "none"; // 隐藏其他数据
-            }
-        });
-    }
-
-    // 在分页按钮点击事件中更新并重新应用分页
-    function updatePagination() {
-        applyPagination();
-    }
-
-    // 当筛选按钮点击时
-    filterButton.addEventListener("click", function(e) {
-        e.preventDefault();
-
-        const filterCategory = document.querySelector("#filterCategory").value;
-
-        if (filterCategory === '0') {
-            fetch("filter-products.php", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        filterCategory
-                    }),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                })
-                .then(r => r.json())
-                .then(data => {
-                    currentPage = 1; // 重置当前页码为第一页
-                    totalRows = data.length;
-                    loadTable(data);
-                    updatePagination(); // 筛选后重新应用分页
-                });
-        }
-    });
-
-    // 点击分页按钮时
-    document.querySelectorAll(".page-link").forEach(pageLink => {
-        pageLink.addEventListener("click", function(e) {
-            e.preventDefault();
-            const page = parseInt(this.innerText);
-            if (!isNaN(page) && page !== currentPage) {
-                currentPage = page;
-                updatePagination(); // 更新并重新应用分页
-            }
-        });
-    });
-
-
+    // 篩選sid降冪排列
     // 價格price 排列
 </script>
 <?php include './index-parts/html-foot.php' ?>
