@@ -56,9 +56,9 @@ if ($totalRows > 0) {
             <!-- Search -->
             <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" id="search-form" name="search-form">
                 <div class="input-group">
-                    <input type="text" id="search-field" name="search-field" class="form-control bg-light border-1 small " placeholder="搜尋商品名稱" aria-label="Search" aria-describedby="basic-addon2" />
+                    <input type="text" id="search-field" name="search-field" class="form-control form-control-sm bg-light border-1 small " placeholder="搜尋商品名稱" aria-label="Search" aria-describedby="basic-addon2" />
                     <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit">
+                        <button class="btn btn-primary btn-sm" type="submit">
                             <i class="fas fa-search fa-sm"></i>
                         </button>
                     </div>
@@ -69,6 +69,20 @@ if ($totalRows > 0) {
                 <a class="text-light" href="add-product.php"><i class="fas fa-plus"></i> 新增商品</a>
             </div>
         </div>
+        <!-- Filter -->
+        <div class="mx-4 my-3">
+            <form id="filter-form" class="d-flex flex-row align-items-center">
+                <label for="filterCategory" class="mb-0">選擇篩選分類：</label>
+                <select id="filterCategory" name="filterCategory" class="form-control form-control-sm " style="width:150px;">
+                    <option value="all">所有分類</option>
+                    <option value="0">#</option>
+                    <option value="1">價格</option>
+                </select>
+                &nbsp;
+                <button type="button" id="filterButton" class="btn btn-warning btn-sm rounded-pill">篩選</button>
+            </form>
+        </div>
+        <!-- 結果顯示 -->
         <div class="card-body">
             <div class="table-responsive scroll" style="max-width: 1800px;">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -83,7 +97,7 @@ if ($totalRows > 0) {
                             <th>累積購買數</th>
                             <th>建立日期</th>
                             <th>是否上架&nbsp;&nbsp;
-                                <button id="filter-toggle" class="btn btn-outline-secondary btn-sm"><i class="fas fa-sort-down"></i></button>
+                                <button id="filter-toggle" class="btn btn-sm btn-outline-secondary btn-sm"><i class="fas fa-sort-down"></i></button>
                             </th>
                             <th><i class="far fa-trash-alt"></i></th>
                             <th><i class="far fa-edit"></i></th>
@@ -103,11 +117,11 @@ if ($totalRows > 0) {
                                 <td><?= $r['create_date'] ?></td>
                                 <?php if (!$r['launch']) : ?>
                                     <td>
-                                        <div class="btn btn-secondary rounded-pill status">未上架</div>
+                                        <div class="btn btn-secondary btn-sm rounded-pill status">未上架</div>
                                     </td>
                                 <?php else : ?>
                                     <td>
-                                        <div class="btn btn-success rounded-pill status">上架中</div>
+                                        <div class="btn btn-success btn-sm rounded-pill status">上架中</div>
                                     </td>
                                 <?php endif; ?>
                                 <td><a href="javascript: deleteItem(<?= $r['sid'] ?>)"><i class="far fa-trash-alt"></a></td>
@@ -160,7 +174,7 @@ if ($totalRows > 0) {
         }
     }
 
-    // Search
+    // Search- product name
     const originalTable = document.querySelector("#original-table")
     const searchForm = document.querySelector("#search-form");
 
@@ -185,7 +199,7 @@ if ($totalRows > 0) {
                 <td>${item.product_id}</td>
                 <td>${item.name}</td>
                 <td>${item.price}</td>
-                <td>${item.descriptions}</td>
+                <td class="text-truncate" style="max-width: 100px;">${item.descriptions}</td>
                 <td>${item.inventory}</td>
                 <td>${item.purchase_qty}</td>
                 <td>${item.create_date}</td>
@@ -201,39 +215,133 @@ if ($totalRows > 0) {
             })
     })
 
-    // launch filter
+    // launch filter ：只能單頁篩選
     const launchFilter = document.querySelector('#filter-toggle');
     let filterState = 'all';
 
     launchFilter.addEventListener("click", function() {
-    const rows = document.querySelectorAll('#dataTable tbody tr');
+        const rows = document.querySelectorAll('#dataTable tbody tr');
 
-    if (filterState === 'all') {
-        rows.forEach(row => {
-            const statusElement = row.querySelector(".status");
-            if (statusElement.textContent === "上架中") {
+        if (filterState === 'all') {
+            rows.forEach(row => {
+                const statusElement = row.querySelector(".status");
+                if (statusElement.textContent === "上架中") {
+                    row.style.display = "table-row";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+            filterState = 'launched';
+        } else if (filterState === "launched") {
+            rows.forEach(row => {
+                const statusElement = row.querySelector(".status");
+                if (statusElement.textContent === "未上架") {
+                    row.style.display = "table-row";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+            filterState = 'not-launched';
+        } else {
+            rows.forEach(row => {
                 row.style.display = "table-row";
-            } else {
-                row.style.display = "none";
-            }
+            });
+            filterState = 'all';
+        }
+    });
+
+
+    // 篩選 sid 升冪排列及頁碼問題
+    let currentPage = <?= $page ?>;
+
+    const filterForm = document.querySelector("#filter-form");
+    const filterButton = document.querySelector("#filterButton")
+
+    function loadTable(data) {
+        originalTable.innerHTML = "";
+
+        data.forEach(item => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+            <td>${item.sid}</td>
+            <td>${item.product_id}</td>
+            <td>${item.name}</td>
+            <td>${item.price}</td>
+            <td class="text-truncate" style="max-width: 100px;">${item.descriptions}</td>
+            <td>${item.inventory}</td>
+            <td>${item.purchase_qty}</td>
+            <td>${item.create_date}</td>
+            <td>${item.launch}</td>
+            <td><a href="javascript: deleteItem(${item.sid})"><i class="far fa-trash-alt"></a></td>
+            <td><a href="edit-product.php?sid=${item.sid}"><i class="far fa-edit"></a></td>
+        `;
+            originalTable.appendChild(row);
         });
-        filterState = 'launched';
-    } else if (filterState === "launched") {
-        rows.forEach(row => {
-            const statusElement = row.querySelector(".status");
-            if (statusElement.textContent === "未上架") {
-                row.style.display = "table-row";
-            } else {
-                row.style.display = "none";
-            }
-        });
-        filterState = 'not-launched';
-    } else {
-        rows.forEach(row => {
-            row.style.display = "table-row";
-        });
-        filterState = 'all';
+
+        // 在这里添加代码以重新应用分页
     }
-});
+
+    function applyPagination() {
+        const originalTable = document.querySelector("#original-table");
+        const rows = originalTable.querySelectorAll("tr");
+
+        const itemsPerPage = 10; // 每页显示的数据数量
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+
+        rows.forEach((row, index) => {
+            if (index >= startIndex && index < endIndex) {
+                row.style.display = "table-row"; // 显示当前页的数据
+            } else {
+                row.style.display = "none"; // 隐藏其他数据
+            }
+        });
+    }
+
+    // 在分页按钮点击事件中更新并重新应用分页
+    function updatePagination() {
+        applyPagination();
+    }
+
+    // 当筛选按钮点击时
+    filterButton.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        const filterCategory = document.querySelector("#filterCategory").value;
+
+        if (filterCategory === '0') {
+            fetch("filter-products.php", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        filterCategory
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(r => r.json())
+                .then(data => {
+                    currentPage = 1; // 重置当前页码为第一页
+                    totalRows = data.length;
+                    loadTable(data);
+                    updatePagination(); // 筛选后重新应用分页
+                });
+        }
+    });
+
+    // 点击分页按钮时
+    document.querySelectorAll(".page-link").forEach(pageLink => {
+        pageLink.addEventListener("click", function(e) {
+            e.preventDefault();
+            const page = parseInt(this.innerText);
+            if (!isNaN(page) && page !== currentPage) {
+                currentPage = page;
+                updatePagination(); // 更新并重新应用分页
+            }
+        });
+    });
+
+
+    // 價格price 排列
 </script>
 <?php include './index-parts/html-foot.php' ?>
