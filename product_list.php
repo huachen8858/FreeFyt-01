@@ -3,6 +3,12 @@ require './index-parts/connect_db.php';
 $title = '商品管理系統';
 $perPage = 5;
 
+// 檢查是否有登入管理者身份
+// if (isset($_SESSION['admin'])){
+//     header('Location: index_.php');
+//     exit;
+// }
+
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 if ($page < 1) {
     header('Location: ?page=1');
