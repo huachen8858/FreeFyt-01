@@ -15,7 +15,7 @@ if ($page < 1) {
     exit; # 結束這支php
 }
 
-// 篩選價格的初始值
+// 篩選價格、分類的初始值
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'original';
 
 # 算筆數
@@ -38,7 +38,7 @@ if ($totalRows > 0) {
         exit;
     };
 
-    // 篩選價格
+    // 篩選價格、分類 issue:頁碼不能更新
     $sql = '';
     if ($sort === 'original') {
         $sql = sprintf(
@@ -120,8 +120,8 @@ if ($totalRows > 0) {
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h5 class="m-0 font-weight-bold text-primary">總商品列表</h5>
-            <!-- Search -->
-            <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" id="search-form" name="search-form">
+            <!-- Search:only product name -->
+            <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" id="search-form" name="search-form">
                 <div class="input-group">
                     <input type="text" id="search-field" name="search-field" class="form-control form-control-sm bg-light border-1 small " placeholder="搜尋商品名稱" aria-label="Search" aria-describedby="basic-addon2" />
                     <div class="input-group-append">
@@ -130,6 +130,19 @@ if ($totalRows > 0) {
                         </button>
                     </div>
                 </div>
+            </form> -->
+            <!-- Search: 商品名稱或商品編號 -->
+            <form id="search-form" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                <select name="search-type" class="form-control form-control-sm form-select form-select-sm">
+                    <option value="name" selected>商品名稱</option>
+                    <option value="id">商品編號</option>
+                </select>
+                <input type="text" id="search-field" class="form-control form-control-sm bg-light border-1 small " placeholder="搜尋商品名稱或編號" >
+                <div class="input-group-append d-sm-inline-block">
+                        <button class="btn btn-primary btn-sm" type="submit">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
             </form>
             <!-- add-product -->
             <div class="btn btn-primary rounded-pill">
@@ -262,7 +275,12 @@ if ($totalRows > 0) {
     searchForm.addEventListener("submit", function(e) {
         e.preventDefault();
         const searchStr = document.querySelector("#search-field").value;
+        const searchType = document.querySelector('select[name="search-type"]').value;
         const fd = new FormData(searchForm);
+        fd.append("search-type", searchType); // Add the search type to FormData
+        fd.append("searchStr", searchStr);
+
+
 
         fetch('product-search-api.php', {
                 method: 'POST',
@@ -284,7 +302,15 @@ if ($totalRows > 0) {
                 <td>${item.inventory}</td>
                 <td>${item.purchase_qty}</td>
                 <td>${item.create_date}</td>
-                <td>${item.launch}</td>
+                <?php if (!$r['launch']) : ?>
+                                    <td>
+                                        <div class="btn btn-secondary btn-sm rounded-pill status">未上架</div>
+                                    </td>
+                                <?php else : ?>
+                                    <td>
+                                        <div class="btn btn-success btn-sm rounded-pill status">上架中</div>
+                                    </td>
+                                <?php endif; ?>
                 <td><a href="javascript: deleteItem(${item.sid})"><i class="far fa-trash-alt"></a></td>
                 <td><a href="edit-product.php?sid=${item.sid}"><i class="far fa-edit"></a></td>
                 `;
@@ -330,9 +356,5 @@ if ($totalRows > 0) {
             filterState = 'all';
         }
     });
-
-
-    // 篩選sid降冪排列
-    // 價格price 排列
 </script>
 <?php include './index-parts/html-foot.php' ?>
