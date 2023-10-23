@@ -46,21 +46,67 @@ if ($totalRows > 0) {
             ($page - 1) * $perPage,
             $perPage
         );
-    } elseif ($sort === 'desc') {
+    } else if ($sort === 'desc') {
         $sql = sprintf(
             "SELECT * FROM product_list ORDER BY price DESC, sid DESC LIMIT %s, %s",
             ($page - 1) * $perPage,
             $perPage
         );
-    } elseif ($sort === 'asc') {
+    } else if ($sort === 'asc') {
         $sql = sprintf(
             "SELECT * FROM product_list ORDER BY price ASC, sid DESC LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } else if ($sort === "goods") {
+        $sql = sprintf(
+            "SELECT * FROM product_list WHERE main_category = '1' ORDER BY sid LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } else if ($sort === 'food') {
+        $sql = sprintf(
+            "SELECT * FROM product_list WHERE main_category = '2' ORDER BY sid LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } else if ($sort === "clothing") {
+        $sql = sprintf(
+            "SELECT * FROM product_list WHERE main_category = '1' AND category = '3' ORDER BY sid LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } else if ($sort === "equipment") {
+        $sql = sprintf(
+            "SELECT * FROM product_list WHERE main_category = '1' AND category = '4' ORDER BY sid LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } else if ($sort === "gears") {
+        $sql = sprintf(
+            "SELECT * FROM product_list WHERE main_category = '1' AND category = '5' ORDER BY sid LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } else if ($sort === "proteins") {
+        $sql = sprintf(
+            "SELECT * FROM product_list WHERE main_category = '2' AND category = '6' ORDER BY sid LIMIT %s, %s",
+            ($page - 1) * $perPage,
+            $perPage
+        );
+    } else if ($sort === "non_proteins") {
+        $sql = sprintf(
+            "SELECT * FROM product_list WHERE main_category = '2' AND category = '7' ORDER BY sid LIMIT %s, %s",
             ($page - 1) * $perPage,
             $perPage
         );
     }
     if (!empty($sql)) {
         $rows = $pdo->query($sql)->fetchAll();
+        // 檢查是否有新的篩選如果有就重算總頁數
+        if ($sort !== 'original') {
+            $totalPages = ceil(count($rows) / $perPage);
+        }
     }
 }
 
@@ -91,27 +137,28 @@ if ($totalRows > 0) {
             </div>
         </div>
         <!-- Filter -->
-        <!-- <div class="mx-4 my-3">
-            <form id="filter-form" class="d-flex flex-row align-items-center">
-                <label for="filterCategory" class="mb-0">選擇篩選分類：</label>
-                <select id="filterCategory" name="filterCategory" class="form-control form-control-sm " style="width:150px;">
-                    <option value="all">所有分類</option>
-                    <option value="0">#</option>
-                    <option value="1">價格</option>
-                </select>
-                &nbsp;
-                <button type="button" class="btn btn-warning btn-sm rounded-pill">篩選</button>
-            </form>
-        </div> -->
-        <!-- Filter -->
         <div class="mx-4 my-2">
-            <a class="btn btn-sm btn-secondary" href="product_list.php">所有資料</a>
+            <a class="btn btn-sm btn-secondary" href="product_list.php">顯示所有資料</a>
         </div>
 
         <div class="mx-4 my-2">
+            <!-- 價格篩選 -->
             <div for="filterCategory" class="mb-0 d-inline">價格篩選：</div>
             <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=asc">由低到高</a>
             <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=desc">由高到低</a>
+            <br />
+        </div>
+        <div class="mx-4 my-2">
+            <!-- 分類篩選 -->
+            <!-- 超過一頁頁數不會更新還是保留1 -->
+            <div for="filterCategory" class="mb-0 d-inline">分類篩選：</div>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=goods">物品</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=food">食品</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=clothing">服裝</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=equipment">器材</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=gears">裝備</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=proteins">蛋白類</a>
+            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=non_proteins">非蛋白類</a>
         </div>
 
 
@@ -130,7 +177,7 @@ if ($totalRows > 0) {
                             <th>累積購買數</th>
                             <th>建立日期</th>
                             <th>是否上架&nbsp;&nbsp;
-                                <button id="filter-toggle" class="btn btn-sm btn-outline-secondary btn-sm"><i class="fas fa-sort-down"></i></button>
+                                <i id="filter-toggle" class="fas fa-sort-down" style="cursor: pointer"></i>
                             </th>
                             <th><i class="far fa-trash-alt"></i></th>
                             <th><i class="far fa-edit"></i></th>
@@ -196,6 +243,7 @@ if ($totalRows > 0) {
             </div>
         </div>
     </div>
+</div>
 
 </div>
 <?php include './index-parts/footerToScripts.php' ?>
