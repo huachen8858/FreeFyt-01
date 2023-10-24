@@ -137,12 +137,12 @@ if ($totalRows > 0) {
                     <option value="name" selected>商品名稱</option>
                     <option value="id">商品編號</option>
                 </select>
-                <input type="text" id="search-field" class="form-control form-control-sm bg-light border-1 small " placeholder="搜尋商品名稱或編號" >
+                <input type="text" id="search-field" class="form-control form-control-sm bg-light border-1 small " placeholder="搜尋商品名稱或編號">
                 <div class="input-group-append d-sm-inline-block">
-                        <button class="btn btn-primary btn-sm" type="submit">
-                            <i class="fas fa-search fa-sm"></i>
-                        </button>
-                    </div>
+                    <button class="btn btn-primary btn-sm" type="submit">
+                        <i class="fas fa-search fa-sm"></i>
+                    </button>
+                </div>
             </form>
             <!-- add-product -->
             <div class="btn btn-primary rounded-pill">

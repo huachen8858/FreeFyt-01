@@ -71,7 +71,7 @@
                 <div id="collapseStore" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="product_list.php">商品管理</a>
-                        <a class="collapse-item" href="order_list">訂單管理</a>
+                        <a class="collapse-item" href="order_list.php">訂單管理</a>
                         <a class="collapse-item" href="store.php">商城</a>
                     </div>
                 </div>
