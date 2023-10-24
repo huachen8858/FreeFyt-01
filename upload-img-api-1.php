@@ -1,5 +1,5 @@
 <?php
-require './index-parts/connect_db.php';
+require './parts/connect_db.php';
 
 $dir = __DIR__ . '/product-imgs/';
 

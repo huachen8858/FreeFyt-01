@@ -1,5 +1,5 @@
 <?php
-require './index-parts/connect_db.php';
+require './parts/connect_db.php';
 $pageName = 'add';
 $title = '新增商品';
 
@@ -14,8 +14,8 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   }
 </style>
 
-<?php include './index-parts/html-head.php' ?>
-<?php include './index-parts/sidebarToTopbar.php' ?>
+<?php include './parts/html-head.php' ?>
+<?php include './parts/sidebarToTopbar.php' ?>
 <div class="container mb-4">
   <div class="row">
     <div class="col">
@@ -110,7 +110,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
 </div>
 </div>
 
-<?php include './index-parts/footerToScripts.php' ?>
+<?php include './parts/footerToScripts.php' ?>
 <script>
   // 先拿到欄位參照，因為一開始是空的 沒有值
   const name_in = document.form1.name;
@@ -310,4 +310,4 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     }
   }
 </script>
-<?php include './index-parts/html-foot.php' ?>
+<?php include './parts/html-foot.php' ?>

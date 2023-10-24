@@ -1,6 +1,6 @@
 <?php
 
-require './index-parts/connect_db.php';
+require './parts/connect_db.php';
 
 $searchStr = $_POST['searchStr'];
 $searchType = $_POST['search-type'];
@@ -21,7 +21,7 @@ if (count($result) > 0) {
 }
 
 # Search:only product name
-// require './index-parts/connect_db.php';
+// require './parts/connect_db.php';
 
 // if (isset($_POST['search-field'])) {
 //     $searchStr = $_POST['search-field'];

@@ -1,5 +1,5 @@
 <?php
-require './index-parts/connect_db.php';
+require './parts/connect_db.php';
 $title = '商品管理系統';
 $perPage = 10;
 
@@ -112,8 +112,8 @@ if ($totalRows > 0) {
 
 ?>
 
-<?php include './index-parts/html-head.php' ?>
-<?php include './index-parts/sidebartoTopbar.php' ?>
+<?php include './parts/html-head.php' ?>
+<?php include './parts/sidebartoTopbar.php' ?>
 
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">商品管理</h1>
@@ -237,7 +237,7 @@ if ($totalRows > 0) {
                         <ul class="pagination">
                             <li class="page-item <?= $page == 1 ? 'disabled' : '' ?>">
                                 <a class="page-link" href="?page=1">
-                                    <i class="fa-solid fa-angles-left"></i></a>
+                                    <i class="fas fa-angle-double-left"></i></a>
                             </li>
                             <?php for ($i = $page - 3; $i <= $page + 3; $i++) :
                                 if ($i >= 1 and $i <= $totalPages) : ?>
@@ -248,7 +248,7 @@ if ($totalRows > 0) {
                             <?php endfor; ?>
                             <li class="page-item <?= $page == $totalPages ? 'disabled' : '' ?>">
                                 <a class="page-link" href="?page=<?= $totalPages ?>">
-                                    <i class="fa-solid fa-angles-right"></i></a>
+                                    <i class="fas fa-angle-double-right"></i></a>
                             </li>
                         </ul>
                     </nav>
@@ -259,7 +259,7 @@ if ($totalRows > 0) {
 </div>
 
 </div>
-<?php include './index-parts/footerToScripts.php' ?>
+<?php include './parts/footerToScripts.php' ?>
 <script>
     function deleteItem(sid) {
         if (confirm(`確定要刪除編號 ${sid} 的資料嗎?
@@ -357,4 +357,4 @@ if ($totalRows > 0) {
         }
     });
 </script>
-<?php include './index-parts/html-foot.php' ?>
+<?php include './parts/html-foot.php' ?>
