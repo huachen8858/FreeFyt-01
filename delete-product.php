@@ -1,5 +1,5 @@
 <?php
-require './parts/connect_db.php';
+require './index-parts/connect_db.php';
 
 // 因為 product_list.php 裡面 script location 有設定網址會加上sid，所以用get去取得丟到變數裡
 $sid = isset($_GET['sid']) ? intval($_GET['sid']) : 0;

@@ -1,5 +1,5 @@
 <?php
-require './parts/connect_db.php';
+require './index-parts/connect_db.php';
 $pageName = 'add';
 $title = '新增商品';
 
@@ -10,8 +10,8 @@ $title = '新增商品';
   }
 </style>
 
-<?php include './parts/html-head.php' ?>
-<?php include './parts/sidebarToTopbar.php' ?>
+<?php include './index-parts/html-head.php' ?>
+<?php include './index-parts/sidebarToTopbar.php' ?>
 <div class="container mb-4">
   <div class="row">
     <div class="col">
@@ -100,7 +100,7 @@ $title = '新增商品';
 </div>
 </div>
 
-<?php include './parts/footerToScripts.php' ?>
+<?php include './index-parts/footerToScripts.php' ?>
 <script>
   // 先拿到欄位參照，因為一開始是空的 沒有值
   const name_in = document.form1.name;
@@ -281,4 +281,4 @@ if (mainImg_hidden.value !== 0) {
     }
   }
 </script>
-<?php include './parts/html-foot.php' ?>
+<?php include './index-parts/html-foot.php' ?>

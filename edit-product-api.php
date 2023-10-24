@@ -1,5 +1,5 @@
 <?php
-require './parts/connect_db.php';
+require './index-parts/connect_db.php';
 
 // 告訴用戶端格式為JSON
 header('Content-Type: application/json');
