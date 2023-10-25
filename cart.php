@@ -2,7 +2,7 @@
 require './index-parts/connect_db.php';
 $title = '購物車';
 
-// 檢查是否有登入管理者身份
+// 檢查是否有登入管理者？？ 會員身份
 // if (isset($_SESSION['admin'])){
 //     header('Location: index_.php');
 //     exit;
@@ -13,7 +13,7 @@ $title = '購物車';
 
 $sql = "SELECT * FROM cart JOIN product_list ON cart.product_sid = product_list.sid";
 $cartItems = $pdo->query($sql)->fetchAll();
-// var_dump($cartItems);
+
 ?>
 
 <?php include './index-parts/html-head.php' ?>
@@ -117,8 +117,27 @@ $cartItems = $pdo->query($sql)->fetchAll();
   }) 
 
   // 送出訂單
-  function sendOrder() {
-    
+  // issue : 總金額totalAmount不知道怎麼傳到後端
+  function sendOrder(event) {
+    event.preventDefault();
+
+    const fd = new FormData(document.form1);
+
+    fetch("sendOrder-api.php", {
+        method: 'POST',
+        body: fd, 
+      }).then(r => r.json())
+      .then(data => {
+        console.log({
+          data
+        })
+        if (data.output.success) {
+          const modal = new bootstrap.Modal(document.querySelector('#hint'));
+          modal.show();
+          form1.qty.value = "";
+        }
+      })
+      .catch(ex => console.log(ex))
   }
 </script>
 <?php include './index-parts/html-foot.php' ?>
