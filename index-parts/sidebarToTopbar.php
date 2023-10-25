@@ -73,6 +73,7 @@
                         <a class="collapse-item" href="product_list.php">商品管理</a>
                         <a class="collapse-item" href="order_list.php">訂單管理</a>
                         <a class="collapse-item" href="store.php">商城</a>
+                        <a class="collapse-item" href="cart.php">購物車</a>
                     </div>
                 </div>
             </li>
