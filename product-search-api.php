@@ -1,6 +1,6 @@
 <?php
 
-require './index-parts/connect_db.php';
+require './parts/connect_db.php';
 
 $searchStr = $_POST['searchStr'];
 $searchType = $_POST['search-type'];
