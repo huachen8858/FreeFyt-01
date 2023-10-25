@@ -108,7 +108,7 @@ $product3 = $pdo->query($sql_product3)->fetch();
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">返回商品列表</button>
                 <!-- 轉到購物車畫面 -->
-                <a class="btn btn-primary" onclick="">查看購物車</a>
+                <a class="btn btn-primary" onclick="goToCart()">查看購物車</a>
               </div>
             </div>
           </div>
@@ -121,6 +121,7 @@ $product3 = $pdo->query($sql_product3)->fetch();
 
 <?php include './index-parts/footerToScripts.php' ?>
 <script>
+  // 新增商品到購物車資料表 AJAX
   function addToCart(event) {
     event.preventDefault();
     const product_sid = document.form1.product_sid.value;
@@ -144,6 +145,11 @@ $product3 = $pdo->query($sql_product3)->fetch();
         }
       })
       .catch(ex => console.log(ex))
+  }
+
+  // 跳轉到購物車
+  function goToCart() {
+    window.location.href = 'cart.php';
   }
 </script>
 <?php include './index-parts/html-foot.php' ?>
