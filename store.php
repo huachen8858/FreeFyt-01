@@ -1,48 +1,12 @@
 <?php
 require './index-parts/connect_db.php';
 $title = '商城';
-$perPage = 10;
 
 // 檢查是否有登入管理者身份
 // if (isset($_SESSION['admin'])){
 //     header('Location: index_.php');
 //     exit;
 // }
-
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-if ($page < 1) {
-  header('Location: ?page=1');
-  exit; # 結束這支php
-}
-
-
-# 算筆數
-$t_sql = "SELECT COUNT(1) FROM order_list";
-
-# 總筆數
-$totalRows = $pdo->query($t_sql)->fetch(PDO::FETCH_NUM)[0];
-
-
-# 預設值
-$totalPages = 0;
-$rows = [];
-
-# 有資料時
-if ($totalRows > 0) {
-  # 總頁數
-  $totalPages = ceil($totalRows / $perPage);
-  if ($page > $totalPages) {
-    header('Location: ?page=' . $totalPages);
-    exit;
-  };
-
-  $sql = sprintf(
-    "SELECT * FROM product_list ORDER BY sid LIMIT %s, %s",
-    ($page - 1) * $perPage,
-    $perPage
-  );
-  $rows = $pdo->query($sql)->fetchAll();
-}
 
 
 // 加入商品圖片
@@ -67,9 +31,10 @@ $product3 = $pdo->query($sql_product3)->fetch();
   <div class="row">
     <div class="col">
       <h5 class="mb-2 font-weight-bold text-primary">最新商品</h5>
-      <div id="info"></div>
+      <!-- <div id="info"></div> -->
 
       <div class="d-flex flex-row justify-content-around">
+        <!-- 商品一 -->
         <div class="card" style="width: 18rem;">
           <form name="form1" onsubmit="return false;">
             <img src="<?= 'product-imgs/' . $product1['img'] ?>" class="card-img-top" alt="...">
@@ -92,16 +57,25 @@ $product3 = $pdo->query($sql_product3)->fetch();
         </div>
 
         <!-- 商品二 -->
+        <!-- 是否要放在跟商品一同一個form裡面？建立新的form? -->
         <div class="card" style="width: 18rem;">
+
           <img src="<?= 'product-imgs/' . $product2['img'] ?>" class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title text-dark"><?= $product2['name'] ?></h5>
+            <input type="hidden" name="price" value="<?= $product2['price'] ?>">
+
             <h4 class="card-text text-dark">$ <?= $product2['price'] ?></h4>
             <p class="card-text"><?= $product2['descriptions'] ?></p>
           </div>
-          <div class="card-body d-flex justify-content-end">
-            <button href="#" class="btn btn-info ">加入購物車</button>
+          <div class="card-body d-flex">
+            <label for="qty" class="text-align-center">數量：</label>
+            <input type="number" class="form-control form-control-sm" name="qty" id="qty" min="1" style="width:180px" required>
           </div>
+          <div class="card-body d-flex justify-content-end">
+            <button class="btn btn-info ">加入購物車</button>
+          </div>
+
         </div>
         <!-- 商品三 -->
         <div class="card" style="width: 18rem;">
@@ -111,8 +85,12 @@ $product3 = $pdo->query($sql_product3)->fetch();
             <h4 class="card-text text-dark">$ <?= $product3['price'] ?></h4>
             <p class="card-text"><?= $product3['descriptions'] ?></p>
           </div>
+          <div class="card-body d-flex">
+            <label for="qty" class="text-align-center">數量：</label>
+            <input type="number" class="form-control form-control-sm" name="qty" id="qty" min="1" style="width:180px" required>
+          </div>
           <div class="card-body d-flex justify-content-end">
-            <button href="#" class="btn btn-info ">加入購物車</button>
+            <button class="btn btn-info ">加入購物車</button>
           </div>
         </div>
 
@@ -130,7 +108,7 @@ $product3 = $pdo->query($sql_product3)->fetch();
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">返回商品列表</button>
                 <!-- 轉到購物車畫面 -->
-                <button type="button" class="btn btn-primary">查看購物車</button>
+                <a class="btn btn-primary" onclick="">查看購物車</a>
               </div>
             </div>
           </div>
@@ -153,7 +131,7 @@ $product3 = $pdo->query($sql_product3)->fetch();
 
     fetch("cart-api.php", {
         method: 'POST',
-        body: fd, // 送出資料格式會自動是mutipart/form-data
+        body: fd, 
       }).then(r => r.json())
       .then(data => {
         console.log({
