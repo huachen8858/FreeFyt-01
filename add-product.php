@@ -1,5 +1,5 @@
 <?php
-require './index-index-parts/connect_db.php';
+require './index-parts/connect_db.php';
 $pageName = 'add';
 $title = '新增商品';
 
@@ -71,7 +71,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
             </div>
             <!-- 是否上架 -->
             <div class="mb-3">
-              <label for="launch" class="form-label">上架狀態</label><br/>
+              <label for="launch" class="form-label">上架狀態</label><br />
               <input type="radio" id="on" name="launch" value="1">
               <label for="launch">上架</label>&nbsp;
               <input type="radio" id="off" name="launch" value="0">
@@ -88,6 +88,17 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
                 <img src="./img/default_img.jpg" alt="" id="mainImg" name="mainImg" width="100%" />
               </div>
             </div>
+            <div class="mb-3">
+              <label for="moreImg" class="form-label">更多商品圖片(建議圖片大小 600 x 600px)</label>
+              <br />
+              <div class="btn btn-secondary uploadButton" style="cursor: pointer" onclick="document.moreImgForm.moreImgInput.click()">點擊上傳更多商品圖片</div>
+              <div class="form-text"></div>
+              <div class="showMoreImg" style="width: 100px">
+                <div id="moreImgContainer1">
+                  <img src="./img/default_img.jpg" alt="" id="moreImg1" name="moreImg" width="100%" />
+                </div>
+              </div>
+            </div>
             <div id="info"></div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
@@ -98,12 +109,12 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         </form>
         <!-- 單一圖片上傳的表單(hidden) -->
         <form name="mainImgForm" hidden>
-          <input type="file" name="mainImg" onchange="previewImg(event)">
+          <input type="file" id="mainImgInput" name="mainImg" onchange="previewImg(event)">
         </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
-        <!-- <form name="moreImgForm" hidden>
-          <input type="file" name="moreImg" onchange="uploadMoreImg()" multiple/>
-        </form> -->
+        <form name="moreImgForm" hidden>
+          <input type="file" id="moreImgInput" name="moreImg[]" onchange="previewMoreImg()" multiple />
+        </form>
       </div>
     </div>
   </div>
@@ -163,6 +174,108 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     // console.log(el.files); // 會拿到FileList
   };
 
+  // 預覽多圖：圖片不會並排顯示可以有空時解決
+  const previewMoreImg = () => {
+    const inputElement = document.getElementById("moreImgInput");
+    // 清空之前的預覽
+    const previewElement = document.getElementById("moreImgContainer1");
+    previewElement.innerHTML = '';
+
+    if (inputElement.files && inputElement.files.length > 0) {
+      for (let i = 0; i < inputElement.files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.width = 100;
+          // 为每个预览图片创建不同的容器
+          const container = document.createElement('div');
+          container.id = "moreImgContainer" + (i + 1);
+          container.appendChild(img);
+          previewElement.appendChild(container);
+        };
+        reader.readAsDataURL(inputElement.files[i]);
+      }
+    }
+  }
+
+
+  // ---- 即時驗證輸入內容
+  name_in.addEventListener("input", function() {
+    validateName();
+  });
+
+  price_in.addEventListener("input", function() {
+    validatePrice();
+  });
+
+  descriptions.addEventListener("input", function() {
+    validateDescription();
+  });
+
+  inventory.addEventListener("input", function() {
+    validateInventory();
+  });
+
+
+  // 當大於2字就回復預設裝飾、提示變成空字串;當不符合就顯示驗證不符合的得提示
+  function validateName() {
+    if (name_in.value.length >= 2) {
+      name_in.style.border = '1px solid #CCCCCC';
+      if (name_in.nextElementSibling) {
+        name_in.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      $isPass = false;
+      name_in.style.border = '2px solid red';
+      name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
+    }
+  }
+
+  function validatePrice() {
+    if (price_in.value > 0) {
+      price_in.style.border = '1px solid #CCCCCC';
+      if (price_in.nextElementSibling) {
+        price_in.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      isPass = false;
+      price_in.style.border = '2px solid red';
+      price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
+    }
+  }
+
+  function validateDescription() {
+    if (descriptions.value.length >= 10) {
+      descriptions.style.border = '1px solid #CCCCCC';
+      if (descriptions.nextElementSibling) {
+        descriptions.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      $isPass = false;
+      descriptions.style.border = '2px solid red';
+      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿10字)';
+    }
+  }
+
+  function validateInventory() {
+    if (inventory.value >= 0 && !isEmpty(inventory.value)) {
+      inventory.style.border = '1px solid #CCCCCC';
+      if (inventory.nextElementSibling) {
+        inventory.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      isPass = false;
+      inventory.style.border = '2px solid red';
+      inventory.nextElementSibling.innerHTML = '請填寫正確的商品庫存量';
+    }
+
+    function isEmpty(value) {
+      return value === null || value === undefined || value === '';
+    }
+  }
+
+
 
 
   // ---- 按下送出按鈕要執行以下驗證及AJAX -----
@@ -206,6 +319,17 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿10字)';
     }
 
+    // 庫存判斷是否有值
+    if (inventory.value < 0 || isEmpty(inventory.value)) {
+      isPass = false;
+      inventory.style.border = '2px solid red';
+      inventory.nextElementSibling.innerHTML = '請填寫正確的商品庫存量';
+    }
+
+    function isEmpty(value) {
+      return value === null || value === undefined || value === '';
+    }
+
     // 5.判斷是否填寫上架狀態
     if (onRadioButton.checked) {
       const launchStatus = onRadioButton.value;
@@ -216,10 +340,10 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
       launchVerify.innerHTML = '請選擇是否要上架';
     }
 
-    // 6.判斷上架狀態：預設為1,如果inventory填寫0自動將launch設為0
-    const inventoryValue = parseInt(inventory.value, 10); 
+    // 6.判斷上架狀態：預設為1,如果inventory填寫0自動將launch設為0 => 可以改成備貨中 不用下架
+    const inventoryValue = parseInt(inventory.value, 10);
     const launchStatus = onRadioButton.checked ? 1 : 0;
-    if (inventoryValue === 0 && launchStatus === 1){
+    if (inventoryValue === 0 && launchStatus === 1) {
       onRadioButton.checked = false;
       offRadioButton.checked = true;
     }
@@ -261,7 +385,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         if (data.success) {
           // alert('商品資料新增成功');
           info.innerHTML = `<div class="alert alert-success" role="alert">
-          商品資料修改成功
+          商品資料新增成功
           </div>`
           sendData2(); // 呼叫先去做圖片上傳
           pauseForOneSecond();
@@ -299,7 +423,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   function pauseForOneSecond() {
     setTimeout(function() {
       location.href = "product_list.php";
-    }, 1000);
+    }, 3000);
   }
 
   //---- 取消新增

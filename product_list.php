@@ -24,7 +24,6 @@ $t_sql = "SELECT COUNT(1) FROM product_list";
 # 總筆數
 $totalRows = $pdo->query($t_sql)->fetch(PDO::FETCH_NUM)[0];
 
-
 # 預設值
 $totalPages = 0;
 $rows = [];
@@ -110,10 +109,26 @@ if ($totalRows > 0) {
     }
 }
 
+
+// 添加篩選按鈕按下會變成深色底
+$sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+$btnClassLowToHigh = $sort === 'asc' ? 'btn-secondary' : 'btn-outline-secondary';
+$btnClassHighToLow = $sort === 'desc' ? 'btn-secondary' : 'btn-outline-secondary';
+$goods = $sort === 'goods' ? 'btn-secondary' : 'btn-outline-secondary';
+$food = $sort === 'food' ? 'btn-secondary' : 'btn-outline-secondary';
+$clothing = $sort === 'clothing' ? 'btn-secondary' : 'btn-outline-secondary';
+$equipment = $sort === 'equipment' ? 'btn-secondary' : 'btn-outline-secondary';
+$gears = $sort === 'gears' ? 'btn-secondary' : 'btn-outline-secondary';
+$proteins = $sort === 'proteins' ? 'btn-secondary' : 'btn-outline-secondary';
+$non_proteins = $sort === 'non_proteins' ? 'btn-secondary' : 'btn-outline-secondary';
+
+// 將搜尋的比數顯示出來：因為每頁限制10筆 所以搜尋結果最多就是10筆 要把頁數改為更多才可以改善
+$searchResultCount = count($rows);
+
 ?>
 
 <?php include './index-parts/html-head.php' ?>
-<?php include './index-parts/sidebartoTopbar.php' ?>
+<?php include './index-parts/sidebarToTopbar.php' ?>
 
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">商品管理</h1>
@@ -148,6 +163,28 @@ if ($totalRows > 0) {
             <div class="btn btn-primary rounded-pill">
                 <a class="text-light" href="add-product.php"><i class="fas fa-plus"></i> 新增商品</a>
             </div>
+            &nbsp;
+            <!-- 多選刪除 -->
+            <div class="btn btn-outline-danger rounded-pill">
+                <a id="deleteSelectedButton"><i class="far fa-trash-alt"></i> 多選刪除</a>
+            </div>
+            <!-- 刪除成功的提示 -->
+            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="successModalLabel">刪除成功</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">已成功刪除資料</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" id="confirmButton">回到列表</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- Filter -->
         <div class="mx-4 my-2">
@@ -157,21 +194,31 @@ if ($totalRows > 0) {
         <div class="mx-4 my-2">
             <!-- 價格篩選 -->
             <div for="filterCategory" class="mb-0 d-inline">價格篩選：</div>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=asc">由低到高</a>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=desc">由高到低</a>
+            <a class="btn btn-sm <?php echo $btnClassLowToHigh; ?>" href="?page=<?= $page ?>&sort=asc">由低到高</a>
+            <a class="btn btn-sm <?php echo $btnClassHighToLow; ?>" href="?page=<?= $page ?>&sort=desc">由高到低</a>
             <br />
         </div>
-        <div class="mx-4 my-2">
+        <div class="mx-4">
             <!-- 分類篩選 -->
             <!-- 超過一頁頁數不會更新還是保留1 -->
-            <div for="filterCategory" class="mb-0 d-inline">分類篩選：</div>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=goods">物品</a>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=food">食品</a>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=clothing">服裝</a>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=equipment">器材</a>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=gears">裝備</a>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=proteins">蛋白類</a>
-            <a class="btn btn-sm btn-outline-secondary" href="?page=<?= $page ?>&sort=non_proteins">非蛋白類</a>
+            <div class="mb-1">
+                <div for="filterCategory" class="mb-0 d-inline">主分類篩選：</div>
+                <a class="btn btn-sm <?php echo $goods; ?>" href="?page=<?= $page ?>&sort=goods">物品</a>
+                <a class="btn btn-sm <?php echo $food; ?>" href="?page=<?= $page ?>&sort=food">食品</a>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div for="filterCategory" class="mb-0 d-inline">次分類篩選：</div>
+                    <a class="btn btn-sm <?php echo $clothing; ?>" href="?page=<?= $page ?>&sort=clothing">服裝</a>
+                    <a class="btn btn-sm <?php echo $equipment; ?>" href="?page=<?= $page ?>&sort=equipment">器材</a>
+                    <a class="btn btn-sm <?php echo $gears; ?>" href="?page=<?= $page ?>&sort=gears">裝備</a>
+                    <a class="btn btn-sm <?php echo $proteins; ?>" href="?page=<?= $page ?>&sort=proteins">蛋白類</a>
+                    <a class="btn btn-sm <?php echo $non_proteins; ?>" href="?page=<?= $page ?>&sort=non_proteins">非蛋白類</a>
+                </div>
+                <div class="search-result-count">
+                    搜尋結果數量: <?php echo $searchResultCount; ?>
+                </div>
+            </div>
         </div>
 
 
@@ -179,8 +226,9 @@ if ($totalRows > 0) {
         <div class="card-body scroll">
             <div class="table-responsive " style="max-width: 1800px;">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
+                    <thead class="table-primary text-dark">
                         <tr>
+                            <th><input type="checkbox" id="selectAllCheckbox"></th>
                             <th>#</th>
                             <th>商品編號</th>
                             <th>商品名稱</th>
@@ -199,11 +247,12 @@ if ($totalRows > 0) {
                     <tbody id="original-table">
                         <?php foreach ($rows as $r) : ?>
                             <tr>
+                                <td><input type="checkbox" name="delete[]" value="<?= $r['sid'] ?>"></td>
                                 <td><?= $r['sid'] ?></td>
                                 <td><?= $r['product_id'] ?></td>
                                 <td><?= htmlentities($r['name']) ?></td>
                                 <td><?= $r['price'] ?></td>
-                                <!-- 隱藏多於文字text-truncate 要記得給寬度 -->
+                                <!-- 隱藏多於文字 text-truncate 要記得給寬度 -->
                                 <td class="text-truncate" style="max-width: 100px;"><?= htmlentities($r['descriptions']) ?></td>
                                 <td><?= $r['inventory'] ?></td>
                                 <td><?= $r['purchase_qty'] ?></td>
@@ -280,8 +329,6 @@ if ($totalRows > 0) {
         fd.append("search-type", searchType); // Add the search type to FormData
         fd.append("searchStr", searchStr);
 
-
-
         fetch('product-search-api.php', {
                 method: 'POST',
                 body: fd,
@@ -294,6 +341,7 @@ if ($totalRows > 0) {
                     data.forEach(item => {
                         const row = document.createElement("tr");
                         row.innerHTML = `
+                <td><input type="checkbox" name="delete[]" value="<?= $r['sid'] ?>"></td>
                 <td>${item.sid}</td>
                 <td>${item.product_id}</td>
                 <td>${item.name}</td>
@@ -319,8 +367,19 @@ if ($totalRows > 0) {
                 } else {
                     resultTable.innerHTML = '<tr><td colspan="13">No results found.</td></tr>';
                 }
+                const resultCountElement = document.getElementById('result-count');
+                resultCountElement.textContent = data.length;
             })
     })
+
+    const searchResultCount = <?= $searchResultCount ?>;
+
+    // 更新搜索结果数量的显示
+    const searchResultCountElement = document.querySelector('.search-result-count');
+    searchResultCountElement.textContent = `搜尋結果數量: ${searchResultCount}`;
+
+
+
 
     // launch filter ：只能單頁篩選
     const launchFilter = document.querySelector('#filter-toggle');
@@ -356,5 +415,72 @@ if ($totalRows > 0) {
             filterState = 'all';
         }
     });
+
+    // 全選打勾
+    const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+    const rowCheckboxes = document.querySelectorAll('input[name="delete[]"]');
+
+    selectAllCheckbox.addEventListener("click", function() {
+        const isChecked = selectAllCheckbox.checked;
+
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
+    });
+
+    //刪除勾選的項目
+    const deleteSelectedButton = document.getElementById('deleteSelectedButton');
+
+    deleteSelectedButton.addEventListener('click', function() {
+        const userConfirmed = confirm(`確定要刪除選取的資料嗎?`);
+        if (userConfirmed) {
+            deleteSelectedItems();
+        }
+    });
+
+    function deleteSelectedItems() {
+        const itemsToDelete = Array.from(document.querySelectorAll('input[name="delete[]"]:checked'))
+            .map(checkbox => checkbox.value);
+
+        if (itemsToDelete.length === 0) {
+
+            alert('請選擇要刪除的項目。');
+            return;
+        }
+
+        fetch('delete-multi-products.php', {
+                method: 'POST',
+                body: JSON.stringify({
+                    items: itemsToDelete
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // 刪除成功，可以更新頁面或執行其他操作
+                    $('#successModal').modal('show');
+                    // // 例如，重新載入項目列表
+                    // setTimeout(function(){
+                    //     location.reload();
+                    // }, 1000)
+
+                    // 跳出刪除成功的提示
+                    const confirmButton = document.getElementById('confirmButton');
+
+                    confirmButton.addEventListener('click', function() {
+                        window.location.href = 'product_list.php';
+                    });
+
+                } else {
+                    alert('刪除失敗，請重試！');
+                }
+            })
+            .catch(error => {
+                console.error('刪除請求失敗:', error);
+            });
+    }
 </script>
 <?php include './index-parts/html-foot.php' ?>
