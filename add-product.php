@@ -372,6 +372,18 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
 
     // 建立只有資料的表單 用formData類型去接
     const fd = new FormData(document.form1);
+    const mainImgForm = new FormData(document.mainImgForm);
+    const moreImgForm = new FormData(document.moreImgForm);
+
+    // 將第二第三個form資料存到主要的
+    mainImgForm.forEach((value, key) => {
+      fd.append(key, value);
+    });
+    moreImgForm.forEach((value, key) => {
+      if (key.startsWith("moreImg")) {
+        fd.append("moreImg[]", value);
+      }
+    });
 
     fetch("add-product-api.php", {
         method: 'POST',
@@ -387,8 +399,8 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
           info.innerHTML = `<div class="alert alert-success" role="alert">
           商品資料新增成功
           </div>`
-          sendData2(); // 呼叫先去做圖片上傳
-          pauseForOneSecond();
+          // sendData2(); // 呼叫先去做圖片上傳
+          // pauseForOneSecond();
         } else {
           for (let n in data.errors) {
             console.log(`n: ${n}`);
@@ -404,27 +416,27 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   }
 
   // 上傳資料完呼叫這支去上傳圖片 要做到資料和圖片同時上傳
-  function sendData2() {
-    const fd_mainImg = new FormData(document.mainImgForm);
-    fetch('add-product-img-api.php', {
-        method: 'POST',
-        body: fd_mainImg,
-      })
-      .then(r => r.json())
-      .then(data => {
-        console.log({
-          data
-        });
-      })
-      .catch(ex => console.log(ex))
-  }
+  // function sendData2() {
+  //   const fd_mainImg = new FormData(document.mainImgForm);
+  //   fetch('add-product-img-api.php', {
+  //       method: 'POST',
+  //       body: fd_mainImg,
+  //     })
+  //     .then(r => r.json())
+  //     .then(data => {
+  //       console.log({
+  //         data
+  //       });
+  //     })
+  //     .catch(ex => console.log(ex))
+  // }
 
   // 等待一秒再跳轉畫面
-  function pauseForOneSecond() {
-    setTimeout(function() {
-      location.href = "product_list.php";
-    }, 3000);
-  }
+  // function pauseForOneSecond() {
+  //   setTimeout(function() {
+  //     location.href = "product_list.php";
+  //   }, 3000);
+  // }
 
   //---- 取消新增
   function cancelSend() {
