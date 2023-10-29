@@ -8,7 +8,11 @@ header('Content-Type: application/json');
 $output = [
   'postData' => $_POST,
   'success' => false,
-  'errors' => [],
+  'errors' => "",
+  'mainImgSuccess' => false,
+  'mainImgFile' => '',
+  'moreImgSuccess' => false,
+  'moreImgFile' => []
 ];
 // echo json_encode($output);
 // exit;
@@ -103,8 +107,8 @@ $stmt->execute([
 ]);
 
 // 如果stmt有新增欄位成功(rowcount=1,布林值為ture),output sucess 就呈現 true, echo 輸出結果
-$output['success'] = boolval($stmt->rowCount());
-echo json_encode($output, JSON_UNESCAPED_UNICODE);
+// $output['success'] = boolval($stmt->rowCount());
+// echo json_encode($output, JSON_UNESCAPED_UNICODE);
 
 
 $latest_sid = $pdo->lastInsertId(); //取得 PK
@@ -120,10 +124,10 @@ $exts = [
   'image/webp' => '.webp',
 ];
 
-$output_img = [
-  'success' => false,
-  'file' => ''
-];
+// $output_img = [
+//   'success' => false,
+//   'file' => ''
+// ];
 
 $mainImg = $_FILES['mainImg'] ?? '';
 
@@ -142,30 +146,30 @@ if (!empty($_FILES) and !empty($_FILES['mainImg']) and $_FILES['mainImg']['error
         $dir . $f . $ext
       )
     ) {
-      $output_img['success'] = true;
-      $output_img['file'] = $f . $ext;
+      $output['mainImgSuccess'] = true;
+      $output['mainImgFile'] = $f . $ext;
     }
 
     $sql = "UPDATE `product_list` SET `img`=? WHERE `sid`= ? ";
     $stmt2 = $pdo->prepare($sql);
 
     $stmt2->execute([
-      $output_img['file'],
+      $output['mainImgFile'],
       $latest_sid
     ]);
 
-    $output_img['success'] = boolval($stmt2->rowCount());
-    echo json_encode($output_img, JSON_UNESCAPED_UNICODE);
+    // $output['success'] = boolval($stmt2->rowCount());
+    // echo json_encode($output_img, JSON_UNESCAPED_UNICODE);
   }
 }
 
 //---- 多圖上傳: 資料表用逗號隔開
 $moreImg = $_FILES['moreImg'] ?? '';
 
-$output_imgs = [
-  'success' => false,
-  'file' => []
-];
+// $output_imgs = [
+//   'success' => false,
+//   'file' => []
+// ];
 
 foreach ($moreImg['name'] as $key => $name) {
   // 對每個數組進行檢查是否為空或是為4 (沒有沒有文件被上傳，可參考php文件Error Messages Explained )
@@ -180,16 +184,15 @@ foreach ($moreImg['name'] as $key => $name) {
     $f = sha1($name . uniqid());
 
     if (move_uploaded_file($moreImg['tmp_name'][$key], $dir . $f . $ext)) {
-      $output_imgs['success'] = true;
-      $output_imgs['file'][] = $f . $ext;
+      $output['moreImgSuccess'] = true;
+      $output['moreImgFile'][] = $f . $ext;
     }
   }
 }
 
-// 将多图像的文件名用逗号分隔
-$moreImagesString = implode(',', $output_imgs['file']);
+// 用逗號隔開多圖的文件名稱
+$moreImagesString = implode(',', $output['moreImgFile']);
 
-// 更新记录以包括多个图像
 $sql = "UPDATE `product_list` SET `more_img`=? WHERE `sid`= ? ";
 $stmt3 = $pdo->prepare($sql);
 
@@ -198,6 +201,12 @@ $stmt3->execute([
   $latest_sid
 ]);
 
-$output_imgs['success'] = boolval($stmt3->rowCount());
+$output['success'] = boolval($stmt->rowCount());
+$output['mainImgSuccess'] = boolval($stmt2->rowCount());
+$output['moreImgSuccess'] = boolval($stmt3->rowCount());
+echo json_encode($output, JSON_UNESCAPED_UNICODE);
 
-echo json_encode($output_imgs, JSON_UNESCAPED_UNICODE);
+
+// $output_imgs['success'] = boolval($stmt3->rowCount());
+
+// echo json_encode($output_imgs, JSON_UNESCAPED_UNICODE);

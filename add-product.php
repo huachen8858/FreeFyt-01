@@ -390,29 +390,49 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
         body: fd, // 送出資料格式會自動是mutipart/form-data
       }).then(r => r.json())
       .then(data => {
-        console.log({
-          data
-        })
-        console.log(data.success);
-        if (data.success) {
-          // alert('商品資料新增成功');
-          info.innerHTML = `<div class="alert alert-success" role="alert">
-          商品資料新增成功
-          </div>`
-          // sendData2(); // 呼叫先去做圖片上傳
-          // pauseForOneSecond();
-        } else {
-          for (let n in data.errors) {
-            console.log(`n: ${n}`);
-            if (document.form1[n]) {
-              const input = document.form1[n];
-              input.style.border = '2px solid red';
-              input.nextElementSibling.innerHTML = data.errors[n];
+        console.log(data);
+          if (data.success && data.mainImgSuccess && data.moreImgSuccess) {
+            console.log("Success: 商品新增成功");
+            info.innerHTML = `<div class="alert alert-success" role="alert">
+          商品新增成功
+        </div>`;
+            pauseForOneSecond();
+          } else {
+            for (let n in data.errors) {
+              console.log(`n: ${n}`);
+              if (document.form1[n]) {
+                const input = document.form1[n];
+                input.style.border = '2px solid red';
+                input.nextElementSibling.innerHTML = item.errors[n];
+              }
             }
           }
-        }
       })
       .catch(ex => console.log(ex))
+      // 僅上傳資料圖片另外做
+      // .then(data => {
+      //   console.log({
+      //     data
+      //   })
+      //   if (data.success) {
+      //     // alert('商品資料新增成功');
+      //     info.innerHTML = `<div class="alert alert-success" role="alert">
+      //     商品資料新增成功
+      //     </div>`
+      //     // sendData2(); // 呼叫先去做圖片上傳
+      //     pauseForOneSecond();
+      //   } else {
+      //     for (let n in data.errors) {
+      //       console.log(`n: ${n}`);
+      //       if (document.form1[n]) {
+      //         const input = document.form1[n];
+      //         input.style.border = '2px solid red';
+      //         input.nextElementSibling.innerHTML = data.errors[n];
+      //       }
+      //     }
+      //   }
+      // })
+      // .catch(ex => console.log(ex))
   }
 
   // 上傳資料完呼叫這支去上傳圖片 要做到資料和圖片同時上傳
@@ -432,11 +452,11 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
   // }
 
   // 等待一秒再跳轉畫面
-  // function pauseForOneSecond() {
-  //   setTimeout(function() {
-  //     location.href = "product_list.php";
-  //   }, 3000);
-  // }
+  function pauseForOneSecond() {
+    setTimeout(function() {
+      location.href = "product_list.php";
+    }, 3000);
+  }
 
   //---- 取消新增
   function cancelSend() {
