@@ -20,6 +20,22 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
 $pageName = 'edit';
 $title = '編輯商品';
 
+// 編輯資料載入時，找出資料庫多圖儲存欄位
+$sql_moreImg = "SELECT more_img FROM product_list WHERE sid = ?";
+$stmt = $pdo->prepare($sql_moreImg);
+$stmt->execute([$sid]);
+$row_moreImg = $stmt->fetch();
+
+$defaultImage = "default_img.jpg";
+
+// 如果資料庫有資料且不為空
+if ($row_moreImg && !empty($row_moreImg['more_img'])) {
+  // 用逗號分割每張圖片檔名
+  $imageFileNames = explode(',', $row_moreImg['more_img']);
+} else {
+  // 如果沒有文件名就補上預設圖
+  $imageFileNames = [$defaultImage];
+}
 ?>
 <style>
   form .form-text {
@@ -116,6 +132,22 @@ $title = '編輯商品';
               </div>
             </div>
             <div id="info"></div>
+            <div class="mb-3">
+              <label for="moreImg" class="form-label">更多商品圖片(建議圖片大小 600 x 600px)</label>
+              <br />
+              <div class="btn btn-secondary uploadButton" style="cursor: pointer" onclick="document.moreImgForm.moreImgInput.click()">點擊上傳更多商品圖片</div>
+              <div class="form-text"></div>
+              <div class="showMoreImg" style="width: 100px">
+                <?php foreach ($imageFileNames as $fileName): ?>
+                  <div id="moreImgContainer1"  class="moreImgPreview">
+                    <img src="./product-imgs/<?= $fileName ?>" alt="" width="100%"  id="moreImg1" name="moreImg"/>
+                  </div>
+                <?php endforeach; ?>
+
+              </div>
+            </div>
+
+            <div id="info"></div>
             <!-- 新增商品／取消新增商品 按鈕 -->
             <div class="d-flex justify-content-center mb-3">
               <button type="submit" class="btn btn-warning rounded-pill">確認修改商品</button> &nbsp;
@@ -126,12 +158,12 @@ $title = '編輯商品';
         <!-- 單一圖片上傳的表單(hidden) -->
         <form name="mainImgForm" hidden>
           <input type="hidden" name="sid" value="<?= $sid ?>">
-          <input type="file" name="mainImg" onchange="previewImg(event)">
+          <input type="file" id="mainImgInput" name="mainImg" onchange="previewImg(event)">
         </form>
         <!-- 多張圖片上傳的表單(hidden)  -->
-        <!-- <form name="moreImgForm" hidden>
-          <input type="file" name="moreImg" onchange="uploadMoreImg()" multiple/>
-        </form> -->
+        <form name="moreImgForm" hidden>
+          <input type="file" id="moreImgInput" name="moreImg[]" onchange="previewMoreImg()" multiple />
+        </form>
       </div>
     </div>
   </div>
@@ -156,7 +188,7 @@ $title = '編輯商品';
   const mainImgElement = document.querySelector("#mainImg");
 
 
-  // 下拉選單的設定
+  // 下拉選單的設定：不用設定因為現在是編輯要去資料庫撈資料
   // const initVals = {
   //   cate1: 1,
   //   cate2: 5
@@ -190,6 +222,106 @@ $title = '編輯商品';
   };
 
 
+  // 預覽多圖：圖片不會並排顯示可以有空時解決
+  const previewMoreImg = () => {
+    const inputElement = document.getElementById("moreImgInput");
+    // 清空之前的預覽
+    const previewElement = document.getElementById("moreImgContainer1");
+    previewElement.innerHTML = '';
+
+    if (inputElement.files && inputElement.files.length > 0) {
+      for (let i = 0; i < inputElement.files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.width = 100;
+          // 為每個預覽圖片創建不同容器
+          const container = document.createElement('div');
+          container.id = "moreImgContainer" + (i + 1);
+          container.appendChild(img);
+          previewElement.appendChild(container);
+        };
+        reader.readAsDataURL(inputElement.files[i]);
+      }
+    }
+  }
+
+
+  // ---- 即時驗證輸入內容
+  name_in.addEventListener("input", function() {
+    validateName();
+  });
+
+  price_in.addEventListener("input", function() {
+    validatePrice();
+  });
+
+  descriptions.addEventListener("input", function() {
+    validateDescription();
+  });
+
+  inventory.addEventListener("input", function() {
+    validateInventory();
+  });
+
+
+  // 當大於2字就回復預設裝飾、提示變成空字串;當不符合就顯示驗證不符合的得提示
+  function validateName() {
+    if (name_in.value.length >= 2) {
+      name_in.style.border = '1px solid #CCCCCC';
+      if (name_in.nextElementSibling) {
+        name_in.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      $isPass = false;
+      name_in.style.border = '2px solid red';
+      name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
+    }
+  }
+
+  function validatePrice() {
+    if (price_in.value > 0) {
+      price_in.style.border = '1px solid #CCCCCC';
+      if (price_in.nextElementSibling) {
+        price_in.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      isPass = false;
+      price_in.style.border = '2px solid red';
+      price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
+    }
+  }
+
+  function validateDescription() {
+    if (descriptions.value.length >= 10) {
+      descriptions.style.border = '1px solid #CCCCCC';
+      if (descriptions.nextElementSibling) {
+        descriptions.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      $isPass = false;
+      descriptions.style.border = '2px solid red';
+      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿10字)';
+    }
+  }
+
+  function validateInventory() {
+    if (inventory.value >= 0 && !isEmpty(inventory.value)) {
+      inventory.style.border = '1px solid #CCCCCC';
+      if (inventory.nextElementSibling) {
+        inventory.nextElementSibling.innerHTML = '';
+      }
+    } else {
+      isPass = false;
+      inventory.style.border = '2px solid red';
+      inventory.nextElementSibling.innerHTML = '請填寫正確的商品庫存量';
+    }
+
+    function isEmpty(value) {
+      return value === null || value === undefined || value === '';
+    }
+  }
 
   // ---- 按下送出按鈕要執行以下
   function sendData(event) {
@@ -206,54 +338,66 @@ $title = '編輯商品';
     uploadButton.style.border = '1px solid #CCCCCC';
     uploadButton.nextElementSibling.innerHTML = '';
 
-    // // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
+    // 先假設表單都是正確資訊，後續判斷如果有誤就把它變成false
     let isPass = true;
 
-    // // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
+    // 2.判斷商品名稱需大於兩個字:如果長度小於二就是資訊有誤
     if (name_in.value.length < 2) {
       $isPass = false;
       name_in.style.border = '2px solid red';
       name_in.nextElementSibling.innerHTML = '請填寫正確的商品名稱';
     }
 
-    // //3.price 如果價格<1 就不是正確值
+    //3.price 如果價格<1 就不是正確值
     if (price_in.value <= 0) {
       isPass = false;
       price_in.style.border = '2px solid red';
       price_in.nextElementSibling.innerHTML = '請填寫正確的商品價格';
     }
 
-    // // 4.category 如果value沒有值，就代表沒選 (尚未釐清) // 設定進去後還是會有 名稱要改
-    // // if (selectedCategory === '0') {
-    // //   isPass = false;
-    // //   category.style.border = '2px solid red';
-    // //   category.nextElementSibling.innerHTML = '請選擇商品類別';
-    // // }
-
-    // // 5.判斷商品描述 需大於50字
+    // 4.判斷商品描述 需大於10字
     if (descriptions.value.length < 10) {
       $isPass = false;
       descriptions.style.border = '2px solid red';
-      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿50字)';
+      descriptions.nextElementSibling.innerHTML = '請填寫商品描述(需滿10字)';
     }
 
-    // // 6.inventory 如果庫存沒有值 或 庫存<0代表資料有誤
-    // if (!inventory.value || inventory.value < 0) {
-    //   isPass = false;
-    //   inventory.style.border = '2px solid red';
-    //   inventory.nextElementSibling.innerHTML = '請填寫庫存';
+    // 庫存判斷是否有值
+    if (inventory.value < 0 || isEmpty(inventory.value)) {
+      isPass = false;
+      inventory.style.border = '2px solid red';
+      inventory.nextElementSibling.innerHTML = '請填寫正確的商品庫存量';
+    }
+
+    function isEmpty(value) {
+      return value === null || value === undefined || value === '';
+    }
+
+    // 5.判斷是否填寫上架狀態 
+    if (onRadioButton.checked) {
+      const launchStatus = onRadioButton.value;
+    } else if (offRadioButton.checked) {
+      const launchStatus = offRadioButton.value;
+    } else {
+      $isPass = false;
+      launchVerify.innerHTML = '請選擇是否要上架';
+    }
+
+    // 6.判斷上架狀態：預設為1,如果inventory填寫0自動將launch設為0 => 可以改成備貨中 不用下架
+    // const inventoryValue = parseInt(inventory.value, 10);
+    // const launchStatus = onRadioButton.checked ? 1 : 0;
+    // if (inventoryValue === 0 && launchStatus === 1) {
+    //   onRadioButton.checked = false;
+    //   offRadioButton.checked = true;
     // }
 
-    // 7.判斷上架狀態：預設為1,如果inventory填寫0就將launch設為0
-
-    // 8.mainImg 圖片驗證
+    // 7.mainImg 檢查圖片是否有上傳
     let imgSrc = mainImgElement.getAttribute("src");
     if (imgSrc == "./img/default_img.jpg") {
       isPass = false;
       uploadButton.style.border = '2px solid red';
       uploadButton.nextElementSibling.innerHTML = '請上傳商品圖片';
     }
-
 
     uploadButton.addEventListener("click", function() {
       // 判定是否使用預設圖
@@ -263,8 +407,6 @@ $title = '編輯商品';
         uploadButton.nextElementSibling.innerHTML = '請上傳商品圖片';
       }
     });
-
-
 
 
     // 沒有通過就不要發送資料

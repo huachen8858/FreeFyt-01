@@ -88,6 +88,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
                 <img src="./img/default_img.jpg" alt="" id="mainImg" name="mainImg" width="100%" />
               </div>
             </div>
+            <div id="info"></div>
             <div class="mb-3">
               <label for="moreImg" class="form-label">更多商品圖片(建議圖片大小 600 x 600px)</label>
               <br />
@@ -188,7 +189,7 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
           const img = document.createElement('img');
           img.src = e.target.result;
           img.width = 100;
-          // 为每个预览图片创建不同的容器
+          // 為每個預覽圖片創建不同容器
           const container = document.createElement('div');
           container.id = "moreImgContainer" + (i + 1);
           container.appendChild(img);
@@ -341,12 +342,12 @@ $rows_category = $pdo->query($sql_category)->fetchAll();
     }
 
     // 6.判斷上架狀態：預設為1,如果inventory填寫0自動將launch設為0 => 可以改成備貨中 不用下架
-    const inventoryValue = parseInt(inventory.value, 10);
-    const launchStatus = onRadioButton.checked ? 1 : 0;
-    if (inventoryValue === 0 && launchStatus === 1) {
-      onRadioButton.checked = false;
-      offRadioButton.checked = true;
-    }
+    // const inventoryValue = parseInt(inventory.value, 10);
+    // const launchStatus = onRadioButton.checked ? 1 : 0;
+    // if (inventoryValue === 0 && launchStatus === 1) {
+    //   onRadioButton.checked = false;
+    //   offRadioButton.checked = true;
+    // }
 
     // 7.mainImg 檢查圖片是否有上傳
     let imgSrc = mainImgElement.getAttribute("src");
